@@ -3,11 +3,12 @@
 
 #include "application.h"
 
-#include "StateCatPresent.h"
-#include "StateTrain.h"
-#include "StateEmpty.h"
-#include "StateInit.h"
-#include "State.h"
+#include "states/StateCatPresent.h"
+#include "states/StateTrain.h"
+#include "states/StateEmpty.h"
+#include "states/StateInit.h"
+#include "states/State.h"
+#include "states/StateDepositCheck.h"
 
 class StateManager
 {
@@ -18,6 +19,7 @@ public:
         STATE_EMPTY,
         STATE_TRAIN,
         STATE_CAT_PRESENT,
+        STATE_DEPOSIT_CHECK,
 
         // Add new states above this line
         STATE__MAX
@@ -32,7 +34,14 @@ public:
 
 private:
     int mStateCurrent;
-    State* mStates[STATE__MAX] = {new StateInit(), new StateEmpty(), new StateTrain(), new StateCatPresent()};
+
+    State* mStates[STATE__MAX] = {
+        new StateInit(),
+        new StateEmpty(),
+        new StateTrain(),
+        new StateCatPresent(),
+        new StateDepositCheck()
+    };
 };
 
 StateManager* getStateManager();

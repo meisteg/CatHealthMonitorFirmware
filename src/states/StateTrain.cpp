@@ -34,7 +34,8 @@ void StateTrain::processReading(float reading)
         mPrevReading = reading;
     }
     else
-    {   // Cat on scale, same as previous reading
+    {
+        // Cat on scale, same as previous reading
         mNumSameReadings++;
 
         if (mNumSameReadings >= NUM_REQ_SAME_READINGS)

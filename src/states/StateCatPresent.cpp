@@ -18,7 +18,7 @@ void StateCatPresent::processReading(float reading)
         if (mNumReadingsLessThanThreshold >= NUM_REQ_READINGS_BELOW_THRESHOLD)
         {
             // Cat is no longer present
-            getStateManager()->setState(StateManager::STATE_EMPTY);
+            getStateManager()->setState(StateManager::STATE_DEPOSIT_CHECK);
         }
     }
 }
