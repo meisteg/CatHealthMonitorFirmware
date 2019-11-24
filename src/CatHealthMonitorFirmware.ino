@@ -1,16 +1,12 @@
 #include "ExponentiallySmoothedValue.h"
 #include "HX711ADC.h"
 #include "StateManager.h"
+#include "Constants.h"
 
 #define HX711_DOUT          D3
 #define HX711_CLK           D2
 
 #define SERIAL_BAUD         115200
-
-#define MAX_LBS_CHANGE      25
-
-// TODO: Read this value from EEPROM?
-#define CALIBRATION_FACTOR  -7050
 
 HX711ADC scale(HX711_DOUT, HX711_CLK);		// parameter "gain" is ommited; the default value 128 is used by the library
 
@@ -18,9 +14,7 @@ ExponentiallySmoothedValue val(0.5f);
 
 int scaleTare(String unused)
 {
-    Serial.println("===== Scale Tare =====");
-    scale.tare();
-    val.reset();
+    Serial.println("===== User Commanded Scale Tare =====");
     getStateManager()->setState(StateManager::STATE_INIT);
 
     return 0;
@@ -41,8 +35,9 @@ int catTrain(String cat_name)
     return -1;
 }
 
-void scaleReading()
+bool scaleReading()
 {
+    bool ret = false;
     float reading = scale.get_units();
 
     if (getStateManager()->isState(StateManager::STATE_INIT))
@@ -61,6 +56,7 @@ void scaleReading()
         {
             val.newSample(reading);
             getStateManager()->setState(StateManager::STATE_EMPTY);
+            ret = true;
         }
     }
     else if (fabs(reading - val.val()) < MAX_LBS_CHANGE)
@@ -71,6 +67,8 @@ void scaleReading()
         reading = val.newSample(reading);
         Serial.print("\t Smooth: ");
         Serial.println(reading, 1);
+
+        ret = true;
     }
     else
     {
@@ -78,6 +76,8 @@ void scaleReading()
         Serial.print("\t drop: ");
         Serial.println(reading, 1);
     }
+
+    return ret;
 }
 
 void setup()
@@ -102,7 +102,9 @@ void loop()
 {
     if (scale.is_ready())
     {
-        scaleReading();
-        getStateManager()->getState()->processReading(val.val());
+        if (scaleReading())
+        {
+            getStateManager()->getState()->processReading(val.val());
+        }
     }
 }

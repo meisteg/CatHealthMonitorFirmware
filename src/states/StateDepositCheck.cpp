@@ -2,8 +2,7 @@
 
 #include "StateDepositCheck.h"
 #include "StateManager.h"
-
-#define NUM_REQ_SAME_READINGS  10
+#include "Constants.h"
 
 String StateDepositCheck::getName()
 {

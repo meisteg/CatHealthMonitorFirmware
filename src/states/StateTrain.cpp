@@ -2,9 +2,7 @@
 
 #include "StateTrain.h"
 #include "StateManager.h"
-
-#define MIN_CAT_WEIGHT_LBS     5.0f
-#define NUM_REQ_SAME_READINGS  10
+#include "Constants.h"
 
 StateTrain::StateTrain() : mNumSameReadings(0), mPrevReading(0.0f)
 {

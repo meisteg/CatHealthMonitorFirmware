@@ -1,8 +1,6 @@
 #include "StateCatPresent.h"
 #include "StateManager.h"
-
-#define CAT_NOT_PRESENT_THRESHOLD         1.0f
-#define NUM_REQ_READINGS_BELOW_THRESHOLD  3
+#include "Constants.h"
 
 String StateCatPresent::getName()
 {
@@ -15,7 +13,7 @@ void StateCatPresent::processReading(float reading)
     {
         mNumReadingsLessThanThreshold++;
 
-        if (mNumReadingsLessThanThreshold >= NUM_REQ_READINGS_BELOW_THRESHOLD)
+        if (mNumReadingsLessThanThreshold >= NUM_REQ_SAME_READINGS)
         {
             // Cat is no longer present
             getStateManager()->setState(StateManager::STATE_DEPOSIT_CHECK);

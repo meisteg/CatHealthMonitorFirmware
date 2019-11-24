@@ -9,6 +9,7 @@ class StateInit : public State
 {
 public:
     String getName() override;
+    void enter() override;
 };
 
 #endif
