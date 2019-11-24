@@ -38,3 +38,8 @@ void StateManager::setState(int state_new)
         mStateCurrent = state_new;
     }
 }
+
+State* StateManager::getState()
+{
+    return mStates[mStateCurrent];
+}

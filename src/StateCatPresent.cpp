@@ -3,4 +3,4 @@
 String StateCatPresent::getName()
 {
     return "CAT_PRESENT";
-};
+}

@@ -7,6 +7,7 @@ class State
 {
 public:
     virtual String getName() = 0;
+    virtual void newReading(float reading);
 };
 
 #endif

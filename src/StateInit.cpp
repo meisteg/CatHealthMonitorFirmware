@@ -3,4 +3,4 @@
 String StateInit::getName()
 {
     return "INIT";
-};
+}

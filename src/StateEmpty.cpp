@@ -3,4 +3,4 @@
 String StateEmpty::getName()
 {
     return "EMPTY";
-};
+}

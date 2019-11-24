@@ -8,7 +8,13 @@
 class StateTrain : public State
 {
 public:
+    StateTrain();
     String getName();
+    void newReading(float reading);
+
+private:
+    int mNumSameReadings;
+    float mPrevReading;
 };
 
 #endif
