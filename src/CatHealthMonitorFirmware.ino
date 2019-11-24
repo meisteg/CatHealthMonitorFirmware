@@ -2,6 +2,7 @@
 #include "HX711ADC.h"
 #include "StateManager.h"
 #include "Constants.h"
+#include "CatManager.h"
 
 #define HX711_DOUT          D3
 #define HX711_CLK           D2
@@ -22,7 +23,8 @@ int scaleTare(String unused)
 
 int catTrain(String cat_name)
 {
-    if (getStateManager()->isState(StateManager::STATE_EMPTY))
+    if (getStateManager()->isState(StateManager::STATE_EMPTY) &&
+        getCatManager()->setupToTrain(cat_name))
     {
         Serial.print("Train New Cat: ");
         Serial.println(cat_name);
@@ -33,6 +35,14 @@ int catTrain(String cat_name)
     }
 
     return -1;
+}
+
+int resetCats(String unused)
+{
+    Serial.println("Removing all cats from memory");
+    getCatManager()->reset();
+
+    return 0;
 }
 
 bool scaleReading()
@@ -86,6 +96,7 @@ void setup()
 
     Particle.function("tare", scaleTare);
     Particle.function("train", catTrain);
+    Particle.function("reset", resetCats);
 
     scale.begin();
 

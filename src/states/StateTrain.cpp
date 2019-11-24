@@ -3,6 +3,7 @@
 #include "StateTrain.h"
 #include "StateManager.h"
 #include "Constants.h"
+#include "CatManager.h"
 
 StateTrain::StateTrain() : mNumSameReadings(0), mPrevReading(0.0f)
 {
@@ -38,9 +39,15 @@ void StateTrain::processReading(float reading)
 
         if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
         {
-            // Cat on scale, and weight captured
-            // TODO: Save weight into Cat Database
+            // Cat on scale, and weight stable
 
+            // Save weight into Cat Database
+            if (!getCatManager()->completeTraining(reading))
+            {
+                // TODO: Notify user that training was rejected
+            }
+
+            // Advance to next state
             getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
         }
     }
