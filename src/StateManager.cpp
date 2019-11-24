@@ -28,14 +28,17 @@ String StateManager::getStateString(int state)
 
 void StateManager::setState(int state_new)
 {
-    if (state_new < STATE__MAX)
+    if ((state_new < STATE__MAX) && (state_new != mStateCurrent))
     {
         Serial.print("state_current = ");
         Serial.print(getStateString(mStateCurrent));
         Serial.print(", state_new = ");
         Serial.println(getStateString(state_new));
 
+        mStates[mStateCurrent]->exit();
+
         mStateCurrent = state_new;
+        mStates[state_new]->enter();
     }
 }
 

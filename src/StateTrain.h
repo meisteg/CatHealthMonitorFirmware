@@ -9,8 +9,9 @@ class StateTrain : public State
 {
 public:
     StateTrain();
-    String getName();
-    void newReading(float reading);
+    String getName() override;
+    void processReading(float reading) override;
+    void exit() override;
 
 private:
     int mNumSameReadings;

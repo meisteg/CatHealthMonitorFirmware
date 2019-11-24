@@ -8,7 +8,14 @@
 class StateCatPresent : public State
 {
 public:
-    String getName();
+    String getName() override;
+    void processReading(float reading) override;
+    void enter() override;
+    void exit() override;
+
+private:
+    system_tick_t mTimeEnter;
+    int mNumReadingsLessThanThreshold;
 };
 
 #endif

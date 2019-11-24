@@ -16,7 +16,7 @@ String StateTrain::getName()
     return "TRAIN";
 }
 
-void StateTrain::newReading(float reading)
+void StateTrain::processReading(float reading)
 {
     reading = roundf(reading * 10) / 10;
 
@@ -42,12 +42,14 @@ void StateTrain::newReading(float reading)
             // Cat on scale, and weight captured
             // TODO: Save weight into Cat Database
 
-            // Cleanup
-            // TODO: Create state exit function to handle cleanup
-            mNumSameReadings = 0;
-            mPrevReading = 0.0f;
-
             getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
         }
     }
+}
+
+void StateTrain::exit()
+{
+    // Cleanup
+    mNumSameReadings = 0;
+    mPrevReading = 0.0f;
 }

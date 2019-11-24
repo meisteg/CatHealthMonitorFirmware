@@ -8,7 +8,7 @@
 class StateInit : public State
 {
 public:
-    String getName();
+    String getName() override;
 };
 
 #endif

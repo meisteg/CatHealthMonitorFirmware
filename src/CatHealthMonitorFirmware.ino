@@ -103,6 +103,6 @@ void loop()
     if (scale.is_ready())
     {
         scaleReading();
-        getStateManager()->getState()->newReading(val.val());
+        getStateManager()->getState()->processReading(val.val());
     }
 }

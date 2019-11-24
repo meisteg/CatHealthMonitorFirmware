@@ -8,7 +8,7 @@
 class StateEmpty : public State
 {
 public:
-    String getName();
+    String getName() override;
 };
 
 #endif

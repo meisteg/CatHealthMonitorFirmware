@@ -6,8 +6,17 @@
 class State
 {
 public:
+    // Gets the name of the state
     virtual String getName() = 0;
-    virtual void newReading(float reading);
+
+    // Passes a new scale reading to the state for processing
+    virtual void processReading(float reading);
+
+    // Called by the State Manager when this state is entered
+    virtual void enter();
+
+    // Called by the State Manager when this state is exited
+    virtual void exit();
 };
 
 #endif
