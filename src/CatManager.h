@@ -45,6 +45,7 @@ private:
     };
 
     CatDataBase mCatDataBase;
+    int mSelectedCat;
 };
 
 CatManager* getCatManager();

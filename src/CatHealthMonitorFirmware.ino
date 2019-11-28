@@ -104,6 +104,7 @@ void setup()
     waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
+    getCatManager()->printCatDatabase();
 
     scale.set_scale(CALIBRATION_FACTOR);
     scale.tare(); //Reset the scale to 0

@@ -3,6 +3,7 @@
 #include "StateEmpty.h"
 #include "StateManager.h"
 #include "Constants.h"
+#include "CatManager.h"
 
 String StateEmpty::getName()
 {
@@ -25,9 +26,8 @@ void StateEmpty::processReading(float reading)
         if (mNumSameNonZeroReadings >= NUM_REQ_SAME_READINGS)
         {
             // Is it a cat?
-            if (reading >= MIN_CAT_WEIGHT_LBS)
+            if (getCatManager()->selectCatByWeight(reading))
             {
-                // TODO: Determine which cat
                 getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
             }
             // Scale drift, cat deposits or litter box cleaning

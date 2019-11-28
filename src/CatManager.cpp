@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "application.h"
 #include "CatManager.h"
 #include "Constants.h"
@@ -8,7 +10,7 @@ CatManager* getCatManager()
     return &catManager;
 }
 
-CatManager::CatManager()
+CatManager::CatManager() : mSelectedCat(0)
 {
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
@@ -18,8 +20,6 @@ CatManager::CatManager()
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
-
-    printCatDatabase();
 }
 
 void CatManager::reset()
@@ -102,6 +102,42 @@ void CatManager::printCatDatabase() const
 
 bool CatManager::selectCatByWeight(float weight)
 {
-    // TODO: implement me
+    mSelectedCat = -1;
+
+    for (int i = 0; i < mCatDataBase.num_cats; ++i)
+    {
+        if (fabs(mCatDataBase.cats[i].weight - weight) <= MAX_CAT_WEIGHT_CHANGE)
+        {
+            if (mSelectedCat >= 0)
+            {
+                // Multiple cats too close in weight!
+                // TODO: notify user of error
+                // NOTE: Consider the training scenario. Is this an error then?
+                mSelectedCat = -1;
+                break;
+            }
+
+            mSelectedCat = i;
+        }
+    }
+
+    if (mSelectedCat >= 0)
+    {
+        Serial.print(mCatDataBase.cats[mSelectedCat].name);
+        Serial.println(" selected");
+
+        if (mCatDataBase.cats[mSelectedCat].weight != weight)
+        {
+            Serial.print("Updating weight to ");
+            Serial.print(weight);
+            Serial.println(" lbs");
+
+            mCatDataBase.cats[mSelectedCat].weight = weight;
+            EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+        }
+
+        return true;
+    }
+
     return false;
 }

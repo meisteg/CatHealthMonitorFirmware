@@ -20,6 +20,9 @@
 // Maximum length of a cat's name
 #define MAX_CAT_NAME_LEN            16
 
+// Maximum amount a cat's weight can change between visits
+#define MAX_CAT_WEIGHT_CHANGE       0.1f
+
 // Maximum change allowed between readings. If greater than this value,
 // assume it is a bad reading and throw it away.
 #define MAX_LBS_CHANGE              25.0f
