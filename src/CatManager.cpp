@@ -10,7 +10,7 @@ CatManager* getCatManager()
     return &catManager;
 }
 
-CatManager::CatManager() : mSelectedCat(0)
+CatManager::CatManager() : mSelectedCat(-1)
 {
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
@@ -66,6 +66,9 @@ bool CatManager::setupToTrain(const String& cat_name)
         CatDataBaseEntry* entry = &(mCatDataBase.cats[mCatDataBase.num_cats]);
         cat_name.getBytes((unsigned char *)entry->name, sizeof(entry->name));
         entry->weight = 0.0f;
+        entry->last_visit = 0;
+        entry->last_duration = 0;
+        entry->last_deposit = 0.0f;
     }
 
     return ret;
@@ -133,11 +136,66 @@ bool CatManager::selectCatByWeight(float weight)
             Serial.println(" lbs");
 
             mCatDataBase.cats[mSelectedCat].weight = weight;
-            EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
         }
+
+        mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
         return true;
     }
 
     return false;
+}
+
+bool CatManager::setCatLastDuration(uint32_t duration)
+{
+    if (mSelectedCat >= 0)
+    {
+        mCatDataBase.cats[mSelectedCat].last_duration = duration;
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CatManager::setCatLastDeposit(float deposit)
+{
+    if (mSelectedCat >= 0)
+    {
+        mCatDataBase.cats[mSelectedCat].last_deposit = deposit;
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool CatManager::publishCatVisit()
+{
+    char publishString[255];
+    CatDataBaseEntry* entry;
+    bool ret = false;
+
+    if (mSelectedCat >= 0)
+    {
+        entry = &(mCatDataBase.cats[mSelectedCat]);
+        snprintf(publishString, sizeof(publishString),
+                 "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"deposit\": %.1f}",
+                 entry->name, entry->weight, entry->last_duration, entry->last_deposit);
+
+        Serial.print("Publishing: ");
+        Serial.println(publishString);
+        ret = Particle.publish("cat_visit", publishString, PRIVATE);
+        if (!ret)
+        {
+            Serial.println("Failed to publish!");
+        }
+
+        mSelectedCat = -1;
+    }
+
+    return ret;
 }

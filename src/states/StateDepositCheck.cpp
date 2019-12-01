@@ -3,6 +3,7 @@
 #include "StateDepositCheck.h"
 #include "StateManager.h"
 #include "Constants.h"
+#include "CatManager.h"
 
 String StateDepositCheck::getName()
 {
@@ -26,9 +27,9 @@ void StateDepositCheck::processReading(float reading)
         if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
         {
             // Deposit determined
-            // TODO: Do something with deposit weight other than print
             Serial.print("Deposit: ");
             Serial.println(reading, 1);
+            getCatManager()->setCatLastDeposit(reading);
 
             getStateManager()->setState(StateManager::STATE_EMPTY);
         }
@@ -45,4 +46,6 @@ void StateDepositCheck::exit()
 {
     mNumSameReadings = 0;
     mPrevReading = 0.0f;
+
+    getCatManager()->publishCatVisit();
 }

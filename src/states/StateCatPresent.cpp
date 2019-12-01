@@ -1,6 +1,7 @@
 #include "StateCatPresent.h"
 #include "StateManager.h"
 #include "Constants.h"
+#include "CatManager.h"
 
 String StateCatPresent::getName()
 {
@@ -35,9 +36,9 @@ void StateCatPresent::exit()
     mTimeEnter = 0;
     mNumReadingsLessThanThreshold = 0;
 
-    // TODO: Do something with duration besides print
     Serial.print("Duration: ");
     Serial.println(duration);
+    getCatManager()->setCatLastDuration(duration);
 
     digitalWrite(PIN_LED, LOW);
 }

@@ -30,11 +30,23 @@ public:
     // Returns true if cat selected, false if no cat with that weight found
     bool selectCatByWeight(float weight);
 
+    // Sets the duration (in milliseconds) of the selected cat's last visit
+    bool setCatLastDuration(uint32_t duration);
+
+    // Sets the amount of deposit for the selected cat's last visit
+    bool setCatLastDeposit(float deposit);
+
+    // Publish event for selected cat's visit
+    bool publishCatVisit();
+
 private:
     struct CatDataBaseEntry
     {
         char name[MAX_CAT_NAME_LEN];
         float weight;
+        time_t last_visit;
+        uint32_t last_duration;
+        float last_deposit;
     };
 
     struct CatDataBase
@@ -45,6 +57,8 @@ private:
     };
 
     CatDataBase mCatDataBase;
+
+    // Currently selected cat in the cat database
     int mSelectedCat;
 };
 
