@@ -14,3 +14,8 @@ void State::exit()
 {
     // Base class does nothing
 }
+
+void State::loop()
+{
+    // Base class does nothing
+}

@@ -33,4 +33,17 @@
 // Number of readings in a row that must match before action is taken
 #define NUM_REQ_SAME_READINGS       10
 
+// Pins used to communicate with the HX711
+#define PIN_HX711_DOUT              D3
+#define PIN_HX711_CLK               D2
+
+// Pin used to toggle the LED on the board
+#define PIN_LED                     D7
+
+// Baud rate of the debug serial port
+#define SERIAL_BAUD                 115200
+
+// Time in milliseconds to wait before toggling the LED in training state
+#define TRAINING_LED_TOGGLE_MS      500
+
 #endif

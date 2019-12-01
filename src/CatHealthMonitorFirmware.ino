@@ -4,12 +4,8 @@
 #include "Constants.h"
 #include "CatManager.h"
 
-#define HX711_DOUT          D3
-#define HX711_CLK           D2
-
-#define SERIAL_BAUD         115200
-
-HX711ADC scale(HX711_DOUT, HX711_CLK);		// parameter "gain" is ommited; the default value 128 is used by the library
+// parameter "gain" is ommited; the default value 128 is used by the library
+HX711ADC scale(PIN_HX711_DOUT, PIN_HX711_CLK);
 
 ExponentiallySmoothedValue val(0.5f);
 
@@ -100,6 +96,8 @@ void setup()
 
     scale.begin();
 
+    pinMode(PIN_LED, OUTPUT);
+
     // Wait for a USB serial connection for up to 10 seconds
     waitFor(Serial.isConnected, 10000);
 
@@ -112,11 +110,17 @@ void setup()
 
 void loop()
 {
+    State *state = getStateManager()->getState();
+
     if (scale.is_ready())
     {
         if (scaleReading())
         {
-            getStateManager()->getState()->processReading(val.val());
+            state->processReading(val.val());
         }
+    }
+    else
+    {
+        state->loop();
     }
 }

@@ -53,9 +53,26 @@ void StateTrain::processReading(float reading)
     }
 }
 
+void StateTrain::enter()
+{
+    mLastLedToggleMillis = millis();
+    mCurrentLedLevel = HIGH;
+    digitalWrite(PIN_LED, mCurrentLedLevel);
+}
+
 void StateTrain::exit()
 {
     // Cleanup
     mNumSameReadings = 0;
     mPrevReading = 0.0f;
+}
+
+void StateTrain::loop()
+{
+    if ((millis() - mLastLedToggleMillis) > TRAINING_LED_TOGGLE_MS)
+    {
+        mLastLedToggleMillis = millis();
+        mCurrentLedLevel = !mCurrentLedLevel;
+        digitalWrite(PIN_LED, mCurrentLedLevel);
+    }
 }

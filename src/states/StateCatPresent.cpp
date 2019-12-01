@@ -25,6 +25,8 @@ void StateCatPresent::enter()
 {
     mTimeEnter = millis();
     mNumReadingsLessThanThreshold = 0;
+
+    digitalWrite(PIN_LED, HIGH);
 }
 
 void StateCatPresent::exit()
@@ -36,4 +38,6 @@ void StateCatPresent::exit()
     // TODO: Do something with duration besides print
     Serial.print("Duration: ");
     Serial.println(duration);
+
+    digitalWrite(PIN_LED, LOW);
 }
