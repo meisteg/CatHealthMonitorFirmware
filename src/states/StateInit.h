@@ -9,6 +9,8 @@ class StateInit : public State
 {
 public:
     String getName() override;
+    bool takeReading() override;
+    void processReading(float reading) override;
     void enter() override;
 };
 
