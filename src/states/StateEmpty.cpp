@@ -33,8 +33,14 @@ void StateEmpty::processReading(float reading)
             // Scale drift, cat deposits or litter box cleaning
             else
             {
+                char publishString[64];
+                snprintf(publishString, sizeof(publishString),
+                         "{\"reading\": %.1f}", reading);
+
                 Serial.print("Automatic tare due to non-zero reading: ");
                 Serial.println(reading, 1);
+                Particle.publish("auto_tare", publishString, PRIVATE);
+
                 getStateManager()->setState(StateManager::STATE_INIT);
             }
         }

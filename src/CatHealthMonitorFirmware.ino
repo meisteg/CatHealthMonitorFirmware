@@ -49,7 +49,7 @@ bool scaleReading()
     if (getStateManager()->isState(StateManager::STATE_INIT))
     {
         // Just tared the scale, so initial reading should be close to zero
-        if (fabs(reading) > 1.0f)
+        if (fabs(reading) > 0.5f)
         {
             Serial.print(millis());
             Serial.print("\t drop: ");
