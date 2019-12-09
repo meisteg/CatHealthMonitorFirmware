@@ -41,6 +41,21 @@ int resetCats(String unused)
     return 0;
 }
 
+int scaleCalibrate(String calibration)
+{
+    int calibration_factor = atoi(calibration.c_str());
+
+    Serial.print("New calibration factor: ");
+    Serial.println(calibration_factor);
+
+    // TODO: Save calibration factor into EEPROM
+
+    scale.set_scale(calibration_factor);
+    getStateManager()->setState(StateManager::STATE_INIT);
+
+    return 0;
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
@@ -48,6 +63,7 @@ void setup()
     Particle.function("tare", scaleTare);
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
+    Particle.function("calibration", scaleCalibrate);
 
     scale.begin();
 
@@ -59,7 +75,7 @@ void setup()
     Serial.println("Cat Health Monitor");
     getCatManager()->printCatDatabase();
 
-    scale.set_scale(CALIBRATION_FACTOR);
+    scale.set_scale(CALIBRATION_FACTOR); // TODO: Read from EEPROM
     scale.tare(); //Reset the scale to 0
 }
 

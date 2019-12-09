@@ -2,7 +2,7 @@
 #define CONSTANTS_H
 
 // Value used to calibrate the scale
-#define CALIBRATION_FACTOR         -7050
+#define CALIBRATION_FACTOR         -10800
 
 // Address of the cat database in the EEPROM
 #define CAT_DATABASE_ADDR           0x0000
