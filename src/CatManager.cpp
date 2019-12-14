@@ -115,9 +115,8 @@ bool CatManager::selectCatByWeight(float weight)
         {
             if (mSelectedCat >= 0)
             {
-                // Multiple cats too close in weight!
-                // TODO: notify user of error
-                // NOTE: Consider the training scenario. Is this an error then?
+                Serial.println("ERROR: Multiple cats too close in weight");
+                Particle.publish("cat_error", "{\"msg\": \"Multiple cats too close in weight!\"}", PRIVATE);
                 mSelectedCat = -1;
                 break;
             }

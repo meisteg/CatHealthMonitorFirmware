@@ -44,7 +44,8 @@ void StateTrain::processReading(float reading)
             // Save weight into Cat Database
             if (!getCatManager()->completeTraining(reading))
             {
-                // TODO: Notify user that training was rejected
+                Serial.println("ERROR: Failed to complete training");
+                Particle.publish("cat_error", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
             }
 
             // Advance to next state
