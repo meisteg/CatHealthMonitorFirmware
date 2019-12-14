@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef CAT_MANAGER_H
 #define CAT_MANAGER_H
 

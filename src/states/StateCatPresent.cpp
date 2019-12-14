@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #include "StateCatPresent.h"
 #include "StateManager.h"
 #include "Constants.h"

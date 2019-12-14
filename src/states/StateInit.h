@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef STATE_INIT_H
 #define STATE_INIT_H
 

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef STATE_TRAIN_H
 #define STATE_TRAIN_H
 

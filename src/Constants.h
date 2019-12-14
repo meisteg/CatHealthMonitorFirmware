@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 

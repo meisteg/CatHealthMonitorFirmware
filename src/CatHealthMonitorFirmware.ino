@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #include "ExponentiallySmoothedValue.h"
 #include "HX711ADC.h"
 #include "StateManager.h"

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef STATE_DEPOSIT_CHECK_H
 #define STATE_DEPOSIT_CHECK_H
 

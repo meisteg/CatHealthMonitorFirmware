@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef CAT_HEALTH_MONITOR_H
 #define CAT_HEALTH_MONITOR_H
 

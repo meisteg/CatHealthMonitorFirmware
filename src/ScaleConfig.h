@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ */
+
 #ifndef SCALE_CONFIG_H
 #define SCALE_CONFIG_H
 
