@@ -55,6 +55,21 @@ int scaleCalibrate(String calibration)
     return 0;
 }
 
+int setAIOKey(String aioKey)
+{
+    if (aioKey.length() == AIO_KEY_LEN)
+    {
+        ScaleConfig::get()->aioKey(aioKey);
+
+        Serial.print("New AIO Key: ");
+        Serial.println(ScaleConfig::get()->aioKey());
+
+        return 0;
+    }
+
+    return -1;
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
@@ -63,6 +78,7 @@ void setup()
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
     Particle.function("calibration", scaleCalibrate);
+    Particle.function("aio_key", setAIOKey);
 
     scale.begin();
 

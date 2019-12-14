@@ -3,6 +3,7 @@
 #include "application.h"
 #include "CatManager.h"
 #include "Constants.h"
+#include "ScaleConfig.h"
 
 CatManager* getCatManager()
 {
@@ -10,7 +11,7 @@ CatManager* getCatManager()
     return &catManager;
 }
 
-CatManager::CatManager() : mSelectedCat(-1)
+CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig::get()->aioKey())
 {
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
@@ -20,6 +21,8 @@ CatManager::CatManager() : mSelectedCat(-1)
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
+
+    mAIOClient.begin();
 }
 
 void CatManager::reset()
@@ -176,23 +179,38 @@ bool CatManager::setCatLastDeposit(float deposit)
 
 bool CatManager::publishCatVisit()
 {
-    char publishString[255];
+    char publish[255];
+    char feed[64];
     CatDataBaseEntry* entry;
     bool ret = false;
 
     if (mSelectedCat >= 0)
     {
         entry = &(mCatDataBase.cats[mSelectedCat]);
-        snprintf(publishString, sizeof(publishString),
+        snprintf(publish, sizeof(publish),
                  "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"deposit\": %.1f}",
                  entry->name, entry->weight, entry->last_duration, entry->last_deposit);
 
         Serial.print("Publishing: ");
-        Serial.println(publishString);
-        ret = Particle.publish("cat_visit", publishString, PRIVATE);
+        Serial.println(publish);
+        ret = Particle.publish("cat_visit", publish, PRIVATE);
         if (!ret)
         {
-            Serial.println("Failed to publish!");
+            Serial.println("Failed to publish to Particle!");
+        }
+
+        // Build Adafruit IO feed name
+        snprintf(feed, sizeof(feed), "cat-health-monitor.%s-weight", String(entry->name).toLowerCase().c_str());
+        Adafruit_IO_Feed aioFeed = mAIOClient.getFeed(feed);
+
+        // Build Adafruit IO publish string
+        snprintf(publish, sizeof(publish), "%.1f", entry->weight);
+
+        // Send to Adafruit IO
+        ret = aioFeed.send(publish);
+        if (!ret)
+        {
+            Serial.println("Failed to publish to Adafruit IO!");
         }
 
         mSelectedCat = -1;

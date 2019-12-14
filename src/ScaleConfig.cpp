@@ -15,8 +15,19 @@ ScaleConfig::ScaleConfig()
         Serial.println("ScaleConfig: EEPROM was empty or invalid");
         mScaleCfg.magic = SCALE_CONFIG_MAGIC_NUMBER;
         mScaleCfg.calibration_factor = CALIBRATION_FACTOR_INIT;
-        EEPROM.put(SCALE_CONFIG_ADDR, mScaleCfg);
+        // mScaleCfg.aio_key intentionally not set
+        save();
     }
+    else
+    {
+        Serial.print("AIO Key: ");
+        Serial.println(aioKey());
+    }
+}
+
+void ScaleConfig::save()
+{
+    EEPROM.put(SCALE_CONFIG_ADDR, mScaleCfg);
 }
 
 int32_t ScaleConfig::calibrationFactor()
@@ -27,5 +38,16 @@ int32_t ScaleConfig::calibrationFactor()
 void ScaleConfig::calibrationFactor(int32_t calibrationFactor)
 {
     mScaleCfg.calibration_factor = calibrationFactor;
-    EEPROM.put(SCALE_CONFIG_ADDR, mScaleCfg);
+    save();
+}
+
+char* ScaleConfig::aioKey()
+{
+    return mScaleCfg.aio_key;
+}
+
+void ScaleConfig::aioKey(String aioKey)
+{
+    aioKey.getBytes((unsigned char *)mScaleCfg.aio_key, sizeof(mScaleCfg.aio_key));
+    save();
 }

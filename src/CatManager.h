@@ -2,6 +2,7 @@
 #define CAT_MANAGER_H
 
 #include "Constants.h"
+#include "Adafruit_IO_Client.h"
 
 class CatManager
 {
@@ -60,6 +61,12 @@ private:
 
     // Currently selected cat in the cat database
     int mSelectedCat;
+
+    // TCP Client used by Adafruit IO library
+    TCPClient mTCPClient;
+
+    // Adafruit IO Client
+    Adafruit_IO_Client mAIOClient;
 };
 
 CatManager* getCatManager();

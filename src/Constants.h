@@ -1,6 +1,9 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
+// Adafruit IO API Key length
+#define AIO_KEY_LEN                 32
+
 // Initial calibration of the scale
 #define CALIBRATION_FACTOR_INIT    -10850
 
