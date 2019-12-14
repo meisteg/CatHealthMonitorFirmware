@@ -15,11 +15,11 @@ bool StateInit::takeReading()
     float reading = scale.get_units();
 
     // Just tared the scale, so initial reading should be close to zero
-    if (fabs(reading) > 0.2f)
+    if (fabs(reading) > 0.05f)
     {
         Serial.print(millis());
         Serial.print("\t drop: ");
-        Serial.println(reading, 1);
+        Serial.println(reading, 2);
 
         // Try to tare again
         scale.tare();

@@ -14,10 +14,10 @@ bool State::takeReading()
     {
         Serial.print(millis());
         Serial.print("\t Raw: ");
-        Serial.print(reading, 1);
+        Serial.print(reading, 2);
         reading = val.newSample(reading);
         Serial.print("\t Smooth: ");
-        Serial.println(reading, 1);
+        Serial.println(reading, 2);
 
         ret = true;
         numDroppedReadings = 0;
@@ -26,7 +26,7 @@ bool State::takeReading()
     {
         Serial.print(millis());
         Serial.print("\t drop: ");
-        Serial.println(reading, 1);
+        Serial.println(reading, 2);
 
         numDroppedReadings++;
     }

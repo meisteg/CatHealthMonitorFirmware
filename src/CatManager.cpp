@@ -80,7 +80,9 @@ bool CatManager::completeTraining(float weight)
     bool ret = !selectCatByWeight(weight);
     if (ret)
     {
-        mCatDataBase.cats[mCatDataBase.num_cats++].weight = weight;
+        mSelectedCat = mCatDataBase.num_cats++;
+        mCatDataBase.cats[mSelectedCat].weight = weight;
+        mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
         printCatDatabase();
@@ -98,7 +100,7 @@ void CatManager::printCatDatabase() const
     {
         Serial.print(mCatDataBase.cats[i].name);
         Serial.print(": ");
-        Serial.print(mCatDataBase.cats[i].weight);
+        Serial.print(mCatDataBase.cats[i].weight, 2);
         Serial.println(" lbs");
     }
 }

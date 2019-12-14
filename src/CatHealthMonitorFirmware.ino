@@ -3,6 +3,7 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "ScaleConfig.h"
 
 // parameter "gain" is ommited; the default value 128 is used by the library
 HX711ADC scale(PIN_HX711_DOUT, PIN_HX711_CLK);
@@ -43,14 +44,12 @@ int resetCats(String unused)
 
 int scaleCalibrate(String calibration)
 {
-    int calibration_factor = atoi(calibration.c_str());
+    ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
     Serial.print("New calibration factor: ");
-    Serial.println(calibration_factor);
+    Serial.println(ScaleConfig::get()->calibrationFactor());
 
-    // TODO: Save calibration factor into EEPROM
-
-    scale.set_scale(calibration_factor);
+    scale.set_scale(ScaleConfig::get()->calibrationFactor());
     getStateManager()->setState(StateManager::STATE_INIT);
 
     return 0;
@@ -75,7 +74,7 @@ void setup()
     Serial.println("Cat Health Monitor");
     getCatManager()->printCatDatabase();
 
-    scale.set_scale(CALIBRATION_FACTOR); // TODO: Read from EEPROM
+    scale.set_scale(ScaleConfig::get()->calibrationFactor());
     scale.tare(); //Reset the scale to 0
 }
 
