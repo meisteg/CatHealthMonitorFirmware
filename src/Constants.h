@@ -28,7 +28,7 @@
 #define MAX_CAT_NAME_LEN            16
 
 // Maximum amount a cat's weight can change between visits
-#define MAX_CAT_WEIGHT_CHANGE       0.1f
+#define MAX_CAT_WEIGHT_CHANGE       0.30f
 
 // Maximum change allowed between readings. If greater than this value,
 // assume it is a bad reading and throw it away.
@@ -38,7 +38,7 @@
 #define MAX_NUM_CATS                5
 
 // Number of readings in a row that must match before action is taken
-#define NUM_REQ_SAME_READINGS       10
+#define NUM_REQ_SAME_READINGS       16
 
 // Pins used to communicate with the HX711
 #define PIN_HX711_DOUT              D3
