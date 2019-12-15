@@ -38,7 +38,7 @@
 #define MAX_NUM_CATS                5
 
 // Number of readings in a row that must match before action is taken
-#define NUM_REQ_SAME_READINGS       16
+#define NUM_REQ_SAME_READINGS       24
 
 // Pins used to communicate with the HX711
 #define PIN_HX711_DOUT              D3
