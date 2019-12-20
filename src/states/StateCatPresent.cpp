@@ -6,6 +6,7 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "ScaleConfig.h"
 
 String StateCatPresent::getName()
 {
@@ -18,7 +19,7 @@ void StateCatPresent::processReading(float reading)
     {
         mNumReadingsLessThanThreshold++;
 
-        if (mNumReadingsLessThanThreshold >= NUM_REQ_SAME_READINGS)
+        if (mNumReadingsLessThanThreshold >= ScaleConfig::get()->numReadingsForStable())
         {
             // Cat is no longer present
             getStateManager()->setState(StateManager::STATE_DEPOSIT_CHECK);

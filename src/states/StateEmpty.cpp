@@ -8,6 +8,7 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "ScaleConfig.h"
 
 String StateEmpty::getName()
 {
@@ -27,7 +28,7 @@ void StateEmpty::processReading(float reading)
     {
         mNumSameNonZeroReadings++;
 
-        if (mNumSameNonZeroReadings >= NUM_REQ_SAME_READINGS)
+        if (mNumSameNonZeroReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Is it a cat?
             if (getCatManager()->selectCatByWeight(reading))

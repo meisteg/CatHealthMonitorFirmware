@@ -74,6 +74,16 @@ int setAIOKey(String aioKey)
     return -1;
 }
 
+int setReadingsForStable(String readings)
+{
+    ScaleConfig::get()->numReadingsForStable(atoi(readings.c_str()));
+
+    Serial.print("New number of readings to be stable: ");
+    Serial.println(ScaleConfig::get()->numReadingsForStable());
+
+    return 0;
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
@@ -83,6 +93,7 @@ void setup()
     Particle.function("reset", resetCats);
     Particle.function("calibration", scaleCalibrate);
     Particle.function("aio_key", setAIOKey);
+    Particle.function("readings_for_stable", setReadingsForStable);
 
     scale.begin();
 

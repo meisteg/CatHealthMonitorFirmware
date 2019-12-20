@@ -37,15 +37,15 @@
 // Maximum number of cats that can be stored
 #define MAX_NUM_CATS                5
 
-// Number of readings in a row that must match before action is taken
-#define NUM_REQ_SAME_READINGS       24
-
 // Pins used to communicate with the HX711
 #define PIN_HX711_DOUT              D3
 #define PIN_HX711_CLK               D2
 
 // Pin used to toggle the LED on the board
 #define PIN_LED                     D7
+
+// Initial value for the number of readings in a row that must match before action is taken
+#define READINGS_TO_BE_STABLE_INIT  10
 
 // Address of the scale configuration in the EEPROM
 #define SCALE_CONFIG_ADDR           0x0400

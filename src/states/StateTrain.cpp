@@ -8,6 +8,7 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "ScaleConfig.h"
 
 StateTrain::StateTrain() : mNumSameReadings(0), mPrevReading(0.0f)
 {
@@ -41,7 +42,7 @@ void StateTrain::processReading(float reading)
         // Cat on scale, same as previous reading
         mNumSameReadings++;
 
-        if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
+        if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Cat on scale, and weight stable
 

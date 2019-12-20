@@ -35,6 +35,7 @@ void CatManager::reset()
     {
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+        mSelectedCat = -1;
     }
     else
     {

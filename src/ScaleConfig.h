@@ -19,6 +19,9 @@ public:
     char* aioKey();
     void aioKey(String aioKey);
 
+    uint8_t numReadingsForStable();
+    void numReadingsForStable(uint8_t readings);
+
 private:
     ScaleConfig();
     void save();
@@ -28,6 +31,7 @@ private:
         uint32_t magic;
         int32_t calibration_factor;
         char aio_key[AIO_KEY_LEN + 1];
+        uint8_t num_readings_for_stable;
     };
 
     ScaleCfg mScaleCfg;
