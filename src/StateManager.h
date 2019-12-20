@@ -13,6 +13,7 @@
 #include "states/StateInit.h"
 #include "states/State.h"
 #include "states/StateDepositCheck.h"
+#include "states/StateCatPossible.h"
 
 class StateManager
 {
@@ -24,6 +25,7 @@ public:
         STATE_TRAIN,
         STATE_CAT_PRESENT,
         STATE_DEPOSIT_CHECK,
+        STATE_CAT_POSSIBLE,
 
         // Add new states above this line
         STATE__MAX
@@ -44,7 +46,8 @@ private:
         new StateEmpty(),
         new StateTrain(),
         new StateCatPresent(),
-        new StateDepositCheck()
+        new StateDepositCheck(),
+        new StateCatPossible()
     };
 };
 

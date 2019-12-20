@@ -4,32 +4,33 @@
 
 #include <math.h>
 
-#include "StateEmpty.h"
+#include "StateCatPossible.h"
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "CatHealthMonitor.h"
 
-String StateEmpty::getName()
+String StateCatPossible::getName()
 {
-    return "EMPTY";
+    return "CAT_POSSIBLE";
 }
 
-void StateEmpty::processReading(float reading)
+void StateCatPossible::processReading(float reading)
 {
     reading = roundf(reading * 10) / 10;
 
-    if ((reading != mPrevReading) || (reading == 0.0f))
+    if (reading != mPrevReading)
     {
-        mNumSameNonZeroReadings = 0;
+        mNumSameReadings = 0;
         mPrevReading = reading;
     }
     else
     {
-        mNumSameNonZeroReadings++;
+        mNumSameReadings++;
 
-        if (mNumSameNonZeroReadings >= NUM_REQ_SAME_READINGS)
+        if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
         {
-            // Is it a cat?
+            // Is it now a cat?
             if (getCatManager()->selectCatByWeight(reading))
             {
                 getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
@@ -41,10 +42,12 @@ void StateEmpty::processReading(float reading)
                          "{\"reading\": %.1f}", reading);
                 Particle.publish("stable_reading", publishString, PRIVATE);
 
-                // Is it possible to be a cat?
-                if (reading >= MIN_CAT_WEIGHT_LBS)
+                // Is it still possible to be a cat?
+                if ((reading >= MIN_CAT_WEIGHT_LBS) && (reading != mInitialReading))
                 {
-                    getStateManager()->setState(StateManager::STATE_CAT_POSSIBLE);
+                    // Wait some more time
+                    mNumSameReadings = 0;
+                    mInitialReading = mPrevReading;
                 }
                 // Scale drift, cat deposits or litter box cleaning
                 else
@@ -59,14 +62,14 @@ void StateEmpty::processReading(float reading)
     }
 }
 
-void StateEmpty::enter()
+void StateCatPossible::enter()
 {
-    mNumSameNonZeroReadings = 0;
-    mPrevReading = 0.0f;
+    mNumSameReadings = 0;
+    mInitialReading = mPrevReading = val.val();
 }
 
-void StateEmpty::exit()
+void StateCatPossible::exit()
 {
-    mNumSameNonZeroReadings = 0;
-    mPrevReading = 0.0f;
+    mNumSameReadings = 0;
+    mInitialReading = mPrevReading = 0.0f;
 }
