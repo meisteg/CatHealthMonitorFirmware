@@ -100,6 +100,9 @@ void setup()
 
     scale.set_scale(ScaleConfig::get()->calibrationFactor());
     scale.tare(); //Reset the scale to 0
+
+    // Publish vitals each hour
+    Particle.publishVitals(3600);
 }
 
 void loop()
