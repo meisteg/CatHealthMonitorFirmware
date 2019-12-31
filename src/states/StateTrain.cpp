@@ -64,6 +64,9 @@ void StateTrain::enter()
     mLastLedToggleMillis = millis();
     mCurrentLedLevel = HIGH;
     digitalWrite(PIN_LED, mCurrentLedLevel);
+
+    // Prevent OTA updates while training
+    System.disableUpdates();
 }
 
 void StateTrain::exit()

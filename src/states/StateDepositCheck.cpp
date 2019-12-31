@@ -45,6 +45,9 @@ void StateDepositCheck::enter()
 {
     mNumSameReadings = 0;
     mPrevReading = 0.0f;
+
+    // Prevent OTA updates while checking cat deposit
+    System.disableUpdates();
 }
 
 void StateDepositCheck::exit()

@@ -56,6 +56,9 @@ void StateEmpty::enter()
 {
     mNumSameNonZeroReadings = 0;
     mPrevReading = 0.0f;
+
+    // Enable OTA updates while empty
+    System.enableUpdates();
 }
 
 void StateEmpty::exit()

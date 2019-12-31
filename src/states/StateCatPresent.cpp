@@ -33,6 +33,9 @@ void StateCatPresent::enter()
     mNumReadingsLessThanThreshold = 0;
 
     digitalWrite(PIN_LED, HIGH);
+
+    // Prevent OTA updates while a cat is present
+    System.disableUpdates();
 }
 
 void StateCatPresent::exit()
