@@ -14,14 +14,6 @@ HX711ADC scale(PIN_HX711_DOUT, PIN_HX711_CLK);
 
 ExponentiallySmoothedValue val(0.5f);
 
-int scaleTare(String unused)
-{
-    Serial.println("===== User Commanded Scale Tare =====");
-    getStateManager()->setState(StateManager::STATE_INIT);
-
-    return 0;
-}
-
 int catTrain(String cat_name)
 {
     if (getStateManager()->isState(StateManager::STATE_EMPTY) &&
@@ -88,7 +80,6 @@ void setup()
 {
     Serial.begin(SERIAL_BAUD);
 
-    Particle.function("tare", scaleTare);
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
     Particle.function("calibration", scaleCalibrate);
