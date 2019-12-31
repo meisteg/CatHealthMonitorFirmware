@@ -15,7 +15,11 @@ CatManager* getCatManager()
     return &catManager;
 }
 
+#if USE_ADAFRUIT_IO
 CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig::get()->aioKey())
+#else
+CatManager::CatManager() : mSelectedCat(-1)
+#endif
 {
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
@@ -26,7 +30,9 @@ CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig:
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
 
+#if USE_ADAFRUIT_IO
     mAIOClient.begin();
+#endif
 }
 
 void CatManager::reset()
@@ -185,9 +191,12 @@ bool CatManager::setCatLastDeposit(float deposit)
 bool CatManager::publishCatVisit()
 {
     char publish[255];
-    char feed[64];
     CatDataBaseEntry* entry;
     bool ret = false;
+
+#if USE_ADAFRUIT_IO
+    char feed[64];
+#endif
 
     if (mSelectedCat >= 0)
     {
@@ -216,6 +225,7 @@ bool CatManager::publishCatVisit()
             Serial.println("Failed to publish to Particle!");
         }
 
+#if USE_ADAFRUIT_IO
         // Build Adafruit IO feed name
         snprintf(feed, sizeof(feed), "cat-health-monitor.%s-weight", String(entry->name).toLowerCase().c_str());
         Adafruit_IO_Feed aioFeed = mAIOClient.getFeed(feed);
@@ -229,6 +239,7 @@ bool CatManager::publishCatVisit()
         {
             Serial.println("Failed to publish to Adafruit IO!");
         }
+#endif
 
         mSelectedCat = -1;
     }

@@ -59,4 +59,7 @@
 // Time in milliseconds to wait before toggling the LED in training state
 #define TRAINING_LED_TOGGLE_MS      500
 
+// Flag to indicate if the compiled target supports using Adafruit IO
+#define USE_ADAFRUIT_IO             (PLATFORM_ID != PLATFORM_XENON)
+
 #endif
