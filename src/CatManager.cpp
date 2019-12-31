@@ -219,11 +219,23 @@ bool CatManager::publishCatVisit()
         }
 
         Serial.printlnf("Publishing: %s", publish);
+#if IS_MASTER_DEVICE
         ret = Particle.publish("cat_visit", publish, PRIVATE);
         if (!ret)
         {
             Serial.println("Failed to publish to Particle!");
         }
+#else
+        ret = true;
+#endif
+
+#if HAL_PLATFORM_MESH
+        if (Mesh.publish("cat_visit", publish) != 0)
+        {
+            Serial.println("Failed to publish to Mesh network!");
+            ret = false;
+        }
+#endif
 
 #if USE_ADAFRUIT_IO
         // Build Adafruit IO feed name
@@ -234,10 +246,10 @@ bool CatManager::publishCatVisit()
         snprintf(publish, sizeof(publish), "%.1f", entry->weight);
 
         // Send to Adafruit IO
-        ret = aioFeed.send(publish);
-        if (!ret)
+        if (!aioFeed.send(publish))
         {
             Serial.println("Failed to publish to Adafruit IO!");
+            ret = false;
         }
 #endif
 
