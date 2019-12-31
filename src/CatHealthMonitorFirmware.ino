@@ -86,12 +86,14 @@ void setup()
     Particle.function("aio_key", setAIOKey);
     Particle.function("readings_for_stable", setReadingsForStable);
 
+    getStateManager()->registerVariable();
+
     scale.begin();
 
     pinMode(PIN_LED, OUTPUT);
 
     // Wait for a USB serial connection for up to 10 seconds
-    waitFor(Serial.isConnected, 10000);
+    // waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
     getCatManager()->printCatDatabase();

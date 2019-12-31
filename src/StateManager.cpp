@@ -15,6 +15,11 @@ StateManager::StateManager() : mStateCurrent(STATE_INIT)
     // Nothing to do
 }
 
+bool StateManager::registerVariable()
+{
+    return Particle.variable("state", mStateCurrent);
+}
+
 bool StateManager::isState(int state)
 {
     return (state == mStateCurrent);
