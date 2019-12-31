@@ -192,12 +192,24 @@ bool CatManager::publishCatVisit()
     if (mSelectedCat >= 0)
     {
         entry = &(mCatDataBase.cats[mSelectedCat]);
-        snprintf(publish, sizeof(publish),
-                 "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"deposit\": %.1f}",
-                 entry->name, entry->weight, entry->last_duration, entry->last_deposit);
 
-        Serial.print("Publishing: ");
-        Serial.println(publish);
+        int duration_sec = ((entry->last_duration + 500) / 1000);
+        if (duration_sec > 60)
+        {
+            snprintf(publish, sizeof(publish),
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minutes %d seconds\", \"deposit\": %.1f}",
+                     entry->name, entry->weight, entry->last_duration,
+                     (duration_sec / 60), (duration_sec % 60), entry->last_deposit);
+        }
+        else
+        {
+            snprintf(publish, sizeof(publish),
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d seconds\", \"deposit\": %.1f}",
+                     entry->name, entry->weight, entry->last_duration,
+                     duration_sec, entry->last_deposit);
+        }
+
+        Serial.printlnf("Publishing: %s", publish);
         ret = Particle.publish("cat_visit", publish, PRIVATE);
         if (!ret)
         {
