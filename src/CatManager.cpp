@@ -15,7 +15,11 @@ CatManager* getCatManager()
     return &catManager;
 }
 
+#if USE_ADAFRUIT_IO
 CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig::get()->aioKey())
+#else
+CatManager::CatManager() : mSelectedCat(-1)
+#endif
 {
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
@@ -26,7 +30,9 @@ CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig:
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
 
+#if USE_ADAFRUIT_IO
     mAIOClient.begin();
+#endif
 }
 
 void CatManager::reset()
@@ -35,6 +41,7 @@ void CatManager::reset()
     {
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+        mSelectedCat = -1;
     }
     else
     {
@@ -184,25 +191,55 @@ bool CatManager::setCatLastDeposit(float deposit)
 bool CatManager::publishCatVisit()
 {
     char publish[255];
-    char feed[64];
     CatDataBaseEntry* entry;
     bool ret = false;
+
+#if USE_ADAFRUIT_IO
+    char feed[64];
+#endif
 
     if (mSelectedCat >= 0)
     {
         entry = &(mCatDataBase.cats[mSelectedCat]);
-        snprintf(publish, sizeof(publish),
-                 "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"deposit\": %.1f}",
-                 entry->name, entry->weight, entry->last_duration, entry->last_deposit);
 
-        Serial.print("Publishing: ");
-        Serial.println(publish);
+        int duration_sec = ((entry->last_duration + 500) / 1000);
+        if (duration_sec > 60)
+        {
+            int mins = (duration_sec / 60);
+            int secs = (duration_sec % 60);
+            snprintf(publish, sizeof(publish),
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
+                     entry->name, entry->weight, entry->last_duration, mins,
+                     (mins > 1) ? "s" : "", secs, (secs == 1) ? "s" : "", entry->last_deposit);
+        }
+        else
+        {
+            snprintf(publish, sizeof(publish),
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d seconds\", \"deposit\": %.1f}",
+                     entry->name, entry->weight, entry->last_duration,
+                     duration_sec, entry->last_deposit);
+        }
+
+        Serial.printlnf("Publishing: %s", publish);
+#if IS_MASTER_DEVICE
         ret = Particle.publish("cat_visit", publish, PRIVATE);
         if (!ret)
         {
             Serial.println("Failed to publish to Particle!");
         }
+#else
+        ret = true;
+#endif
 
+#if HAL_PLATFORM_MESH
+        if (Mesh.publish("cat_visit", publish) != 0)
+        {
+            Serial.println("Failed to publish to Mesh network!");
+            ret = false;
+        }
+#endif
+
+#if USE_ADAFRUIT_IO
         // Build Adafruit IO feed name
         snprintf(feed, sizeof(feed), "cat-health-monitor.%s-weight", String(entry->name).toLowerCase().c_str());
         Adafruit_IO_Feed aioFeed = mAIOClient.getFeed(feed);
@@ -211,11 +248,12 @@ bool CatManager::publishCatVisit()
         snprintf(publish, sizeof(publish), "%.1f", entry->weight);
 
         // Send to Adafruit IO
-        ret = aioFeed.send(publish);
-        if (!ret)
+        if (!aioFeed.send(publish))
         {
             Serial.println("Failed to publish to Adafruit IO!");
+            ret = false;
         }
+#endif
 
         mSelectedCat = -1;
     }

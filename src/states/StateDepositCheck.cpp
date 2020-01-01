@@ -8,6 +8,7 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
+#include "ScaleConfig.h"
 
 String StateDepositCheck::getName()
 {
@@ -28,7 +29,7 @@ void StateDepositCheck::processReading(float reading)
     {
         mNumSameReadings++;
 
-        if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
+        if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Deposit determined
             Serial.print("Deposit: ");
@@ -44,6 +45,9 @@ void StateDepositCheck::enter()
 {
     mNumSameReadings = 0;
     mPrevReading = 0.0f;
+
+    // Prevent OTA updates while checking cat deposit
+    System.disableUpdates();
 }
 
 void StateDepositCheck::exit()

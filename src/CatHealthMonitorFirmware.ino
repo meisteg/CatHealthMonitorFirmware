@@ -14,14 +14,6 @@ HX711ADC scale(PIN_HX711_DOUT, PIN_HX711_CLK);
 
 ExponentiallySmoothedValue val(0.5f);
 
-int scaleTare(String unused)
-{
-    Serial.println("===== User Commanded Scale Tare =====");
-    getStateManager()->setState(StateManager::STATE_INIT);
-
-    return 0;
-}
-
 int catTrain(String cat_name)
 {
     if (getStateManager()->isState(StateManager::STATE_EMPTY) &&
@@ -74,28 +66,43 @@ int setAIOKey(String aioKey)
     return -1;
 }
 
+int setReadingsForStable(String readings)
+{
+    ScaleConfig::get()->numReadingsForStable(atoi(readings.c_str()));
+
+    Serial.print("New number of readings to be stable: ");
+    Serial.println(ScaleConfig::get()->numReadingsForStable());
+
+    return 0;
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
 
-    Particle.function("tare", scaleTare);
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
     Particle.function("calibration", scaleCalibrate);
     Particle.function("aio_key", setAIOKey);
+    Particle.function("readings_for_stable", setReadingsForStable);
+
+    getStateManager()->registerVariable();
 
     scale.begin();
 
     pinMode(PIN_LED, OUTPUT);
 
     // Wait for a USB serial connection for up to 10 seconds
-    waitFor(Serial.isConnected, 10000);
+    // waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
     getCatManager()->printCatDatabase();
 
     scale.set_scale(ScaleConfig::get()->calibrationFactor());
     scale.tare(); //Reset the scale to 0
+
+    // Publish vitals each hour
+    Particle.publishVitals(3600);
 }
 
 void loop()

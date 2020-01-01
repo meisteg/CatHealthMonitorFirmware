@@ -20,6 +20,9 @@
 // Weight used to determine that a cat is no longer present
 #define CAT_NOT_PRESENT_THRESHOLD   1.0f
 
+// Flag to indicate if the compiled target is the gateway mesh device
+#define IS_MASTER_DEVICE            (PLATFORM_ID != PLATFORM_XENON)
+
 // Minimum weight of a cat before it will register
 // Must be greater than CAT_NOT_PRESENT_THRESHOLD
 #define MIN_CAT_WEIGHT_LBS          4.0f
@@ -37,15 +40,15 @@
 // Maximum number of cats that can be stored
 #define MAX_NUM_CATS                5
 
-// Number of readings in a row that must match before action is taken
-#define NUM_REQ_SAME_READINGS       24
-
 // Pins used to communicate with the HX711
 #define PIN_HX711_DOUT              D3
 #define PIN_HX711_CLK               D2
 
 // Pin used to toggle the LED on the board
 #define PIN_LED                     D7
+
+// Initial value for the number of readings in a row that must match before action is taken
+#define READINGS_TO_BE_STABLE_INIT  10
 
 // Address of the scale configuration in the EEPROM
 #define SCALE_CONFIG_ADDR           0x0400
@@ -58,5 +61,8 @@
 
 // Time in milliseconds to wait before toggling the LED in training state
 #define TRAINING_LED_TOGGLE_MS      500
+
+// Flag to indicate if the compiled target supports using Adafruit IO
+#define USE_ADAFRUIT_IO             (PLATFORM_ID != PLATFORM_XENON)
 
 #endif

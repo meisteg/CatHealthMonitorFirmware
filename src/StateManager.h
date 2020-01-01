@@ -33,6 +33,7 @@ public:
 
     StateManager();
 
+    bool registerVariable();
     bool isState(int state);
     String getStateString(int state);
     void setState(int state_new);
