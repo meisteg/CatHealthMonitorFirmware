@@ -9,6 +9,7 @@
 #include "Constants.h"
 #include "CatManager.h"
 #include "CatHealthMonitor.h"
+#include "ScaleConfig.h"
 
 String StateCatPossible::getName()
 {
@@ -28,7 +29,7 @@ void StateCatPossible::processReading(float reading)
     {
         mNumSameReadings++;
 
-        if (mNumSameReadings >= NUM_REQ_SAME_READINGS)
+        if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Is it now a cat?
             if (getCatManager()->selectCatByWeight(reading))
@@ -65,11 +66,8 @@ void StateCatPossible::processReading(float reading)
 void StateCatPossible::enter()
 {
     mNumSameReadings = 0;
-    mInitialReading = mPrevReading = val.val();
-}
+    mInitialReading = mPrevReading = roundf(val.val() * 10) / 10;
 
-void StateCatPossible::exit()
-{
-    mNumSameReadings = 0;
-    mInitialReading = mPrevReading = 0.0f;
+    // Prevent OTA updates while determining if a cat is present
+    System.disableUpdates();
 }

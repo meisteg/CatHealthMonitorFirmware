@@ -15,7 +15,6 @@ public:
     String getName() override;
     void processReading(float reading) override;
     void enter() override;
-    void exit() override;
 
 private:
     int mNumSameReadings;
