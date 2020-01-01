@@ -205,10 +205,12 @@ bool CatManager::publishCatVisit()
         int duration_sec = ((entry->last_duration + 500) / 1000);
         if (duration_sec > 60)
         {
+            int mins = (duration_sec / 60);
+            int secs = (duration_sec % 60);
             snprintf(publish, sizeof(publish),
-                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minutes %d seconds\", \"deposit\": %.1f}",
-                     entry->name, entry->weight, entry->last_duration,
-                     (duration_sec / 60), (duration_sec % 60), entry->last_deposit);
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
+                     entry->name, entry->weight, entry->last_duration, mins,
+                     (mins > 1) ? "s" : "", secs, (secs == 1) ? "s" : "", entry->last_deposit);
         }
         else
         {
