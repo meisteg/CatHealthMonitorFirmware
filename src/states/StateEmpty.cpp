@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -31,9 +31,9 @@ void StateEmpty::processReading(float reading)
         if (mNumSameNonZeroReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Is it a cat?
-            if (getCatManager()->selectCatByWeight(reading))
+            if (CatManager::get()->selectCatByWeight(reading))
             {
-                getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
+                StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
             }
             else
             {
@@ -45,7 +45,7 @@ void StateEmpty::processReading(float reading)
                 // Is it possible to be a cat?
                 if (reading >= MIN_CAT_WEIGHT_LBS)
                 {
-                    getStateManager()->setState(StateManager::STATE_CAT_POSSIBLE);
+                    StateManager::get()->setState(StateManager::STATE_CAT_POSSIBLE);
                 }
                 // Scale drift, cat deposits or litter box cleaning
                 else
@@ -53,7 +53,7 @@ void StateEmpty::processReading(float reading)
                     Serial.print("Automatic tare due to non-zero reading: ");
                     Serial.println(reading, 1);
 
-                    getStateManager()->setState(StateManager::STATE_INIT);
+                    StateManager::get()->setState(StateManager::STATE_INIT);
                 }
             }
         }

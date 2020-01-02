@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "StateCatPresent.h"
@@ -22,7 +22,7 @@ void StateCatPresent::processReading(float reading)
         if (mNumReadingsLessThanThreshold >= ScaleConfig::get()->numReadingsForStable())
         {
             // Cat is no longer present
-            getStateManager()->setState(StateManager::STATE_DEPOSIT_CHECK);
+            StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);
         }
     }
 }
@@ -46,7 +46,7 @@ void StateCatPresent::exit()
 
     Serial.print("Duration: ");
     Serial.println(duration);
-    getCatManager()->setCatLastDuration(duration);
+    CatManager::get()->setCatLastDuration(duration);
 
     digitalWrite(PIN_LED, LOW);
 }

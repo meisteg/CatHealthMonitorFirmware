@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -47,14 +47,14 @@ void StateTrain::processReading(float reading)
             // Cat on scale, and weight stable
 
             // Save weight into Cat Database
-            if (!getCatManager()->completeTraining(reading))
+            if (!CatManager::get()->completeTraining(reading))
             {
                 Serial.println("ERROR: Failed to complete training");
                 Particle.publish("cat_error", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
             }
 
             // Advance to next state
-            getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
+            StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
         }
     }
 }

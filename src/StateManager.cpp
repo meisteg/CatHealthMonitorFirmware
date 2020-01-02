@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "StateManager.h"
 
-StateManager* getStateManager()
+StateManager* StateManager::get()
 {
     static StateManager stateManager;
     return &stateManager;

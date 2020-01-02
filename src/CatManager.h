@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef CAT_MANAGER_H
@@ -14,8 +14,8 @@
 class CatManager
 {
 public:
-    // Constructor
-    CatManager();
+    // Get the CatManager singleton
+    static CatManager* get();
 
     // Removes all saved cats from memory
     void reset();
@@ -48,6 +48,9 @@ public:
     bool publishCatVisit();
 
 private:
+    // Constructor
+    CatManager();
+
     struct CatDataBaseEntry
     {
         char name[MAX_CAT_NAME_LEN];
@@ -77,7 +80,5 @@ private:
     Adafruit_IO_Client mAIOClient;
 #endif
 };
-
-CatManager* getCatManager();
 
 #endif

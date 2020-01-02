@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "ExponentiallySmoothedValue.h"
@@ -16,13 +16,13 @@ ExponentiallySmoothedValue val(0.5f);
 
 int catTrain(String cat_name)
 {
-    if (getStateManager()->isState(StateManager::STATE_EMPTY) &&
-        getCatManager()->setupToTrain(cat_name))
+    if (StateManager::get()->isState(StateManager::STATE_EMPTY) &&
+        CatManager::get()->setupToTrain(cat_name))
     {
         Serial.print("Train New Cat: ");
         Serial.println(cat_name);
 
-        getStateManager()->setState(StateManager::STATE_TRAIN);
+        StateManager::get()->setState(StateManager::STATE_TRAIN);
 
         return 0;
     }
@@ -33,7 +33,7 @@ int catTrain(String cat_name)
 int resetCats(String unused)
 {
     Serial.println("Removing all cats from memory");
-    getCatManager()->reset();
+    CatManager::get()->reset();
 
     return 0;
 }
@@ -46,7 +46,7 @@ int scaleCalibrate(String calibration)
     Serial.println(ScaleConfig::get()->calibrationFactor());
 
     scale.set_scale(ScaleConfig::get()->calibrationFactor());
-    getStateManager()->setState(StateManager::STATE_INIT);
+    StateManager::get()->setState(StateManager::STATE_INIT);
 
     return 0;
 }
@@ -86,7 +86,7 @@ void setup()
     Particle.function("aio_key", setAIOKey);
     Particle.function("readings_for_stable", setReadingsForStable);
 
-    getStateManager()->registerVariable();
+    StateManager::get()->registerVariable();
 
     scale.begin();
 
@@ -96,7 +96,7 @@ void setup()
     // waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
-    getCatManager()->printCatDatabase();
+    CatManager::get()->printCatDatabase();
 
     scale.set_scale(ScaleConfig::get()->calibrationFactor());
     scale.tare(); //Reset the scale to 0
@@ -107,7 +107,7 @@ void setup()
 
 void loop()
 {
-    State *state = getStateManager()->getState();
+    State *state = StateManager::get()->getState();
 
     if (scale.is_ready())
     {

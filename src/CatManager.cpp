@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -9,7 +9,7 @@
 #include "Constants.h"
 #include "ScaleConfig.h"
 
-CatManager* getCatManager()
+CatManager* CatManager::get()
 {
     static CatManager catManager;
     return &catManager;

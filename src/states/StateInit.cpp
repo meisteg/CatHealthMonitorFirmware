@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -40,7 +40,7 @@ bool StateInit::takeReading()
 void StateInit::processReading(float reading)
 {
     // If we get here, the scale is properly tared. More to next state.
-    getStateManager()->setState(StateManager::STATE_EMPTY);
+    StateManager::get()->setState(StateManager::STATE_EMPTY);
 }
 
 void StateInit::enter()

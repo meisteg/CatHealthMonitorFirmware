@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -32,9 +32,9 @@ void StateCatPossible::processReading(float reading)
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Is it now a cat?
-            if (getCatManager()->selectCatByWeight(reading))
+            if (CatManager::get()->selectCatByWeight(reading))
             {
-                getStateManager()->setState(StateManager::STATE_CAT_PRESENT);
+                StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
             }
             else
             {
@@ -56,7 +56,7 @@ void StateCatPossible::processReading(float reading)
                     Serial.print("Automatic tare due to non-zero reading: ");
                     Serial.println(reading, 1);
 
-                    getStateManager()->setState(StateManager::STATE_INIT);
+                    StateManager::get()->setState(StateManager::STATE_INIT);
                 }
             }
         }

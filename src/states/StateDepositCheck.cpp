@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -34,9 +34,9 @@ void StateDepositCheck::processReading(float reading)
             // Deposit determined
             Serial.print("Deposit: ");
             Serial.println(reading, 1);
-            getCatManager()->setCatLastDeposit(reading);
+            CatManager::get()->setCatLastDeposit(reading);
 
-            getStateManager()->setState(StateManager::STATE_EMPTY);
+            StateManager::get()->setState(StateManager::STATE_EMPTY);
         }
     }
 }
@@ -55,5 +55,5 @@ void StateDepositCheck::exit()
     mNumSameReadings = 0;
     mPrevReading = 0.0f;
 
-    getCatManager()->publishCatVisit();
+    CatManager::get()->publishCatVisit();
 }
