@@ -210,7 +210,7 @@ bool CatManager::publishCatVisit()
             snprintf(publish, sizeof(publish),
                      "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
                      entry->name, entry->weight, entry->last_duration, mins,
-                     (mins > 1) ? "s" : "", secs, (secs == 1) ? "s" : "", entry->last_deposit);
+                     (mins > 1) ? "s" : "", secs, (secs == 1) ? "" : "s", entry->last_deposit);
         }
         else
         {
