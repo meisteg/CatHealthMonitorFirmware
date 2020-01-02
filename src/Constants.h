@@ -20,6 +20,9 @@
 // Weight used to determine that a cat is no longer present
 #define CAT_NOT_PRESENT_THRESHOLD   1.0f
 
+// Number of Grams in a Pound
+#define GRAMS_IN_POUND              453.592f
+
 // Flag to indicate if the compiled target is the gateway mesh device
 #define IS_MASTER_DEVICE            (PLATFORM_ID != PLATFORM_XENON)
 

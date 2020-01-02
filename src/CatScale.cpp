@@ -12,7 +12,7 @@ CatScale* CatScale::get()
     return &catScale;
 }
 
-CatScale::CatScale() : mScale(PIN_HX711_DOUT, PIN_HX711_CLK), mSmoothPounds(SMOOTH_TIME_CONSTANT), isTared(false)
+CatScale::CatScale() : mScale(PIN_HX711_DOUT, PIN_HX711_CLK), mSmoothReading(SMOOTH_TIME_CONSTANT), isTared(false)
 {
     // Nothing to do
 }
@@ -26,7 +26,7 @@ void CatScale::begin()
 void CatScale::tare()
 {
     mScale.tare();
-    mSmoothPounds.reset();
+    mSmoothReading.reset();
     isTared = true;
 }
 
@@ -39,7 +39,8 @@ bool CatScale::takeReading()
 {
     static unsigned int numDroppedReadings = 0;
     bool ret = false;
-    float reading = (mScale.get_value() / (float)ScaleConfig::get()->calibrationFactor());
+    double scaleValue = mScale.get_value();
+    float newPounds = getPounds(scaleValue);
 
     // If the scale was just tared, there is not a previous reading to compare against.
     // Simply take the reading in that case.
@@ -50,11 +51,10 @@ bool CatScale::takeReading()
     // However, it is possible that a drastically different reading is valid. If multiple
     // readings in a row are dropped, assume the new reading is actually good. This prevents
     // a senario where readings are dropped forever.
-    if (isTared || (fabs(reading - getPounds()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
+    if (isTared || (fabs(newPounds - getPounds()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
     {
-        Serial.printf("%u\t Raw: %.2f", millis(), reading);
-        reading = mSmoothPounds.newSample(reading);
-        Serial.printlnf("\t Smooth: %.2f", reading);
+        mSmoothReading.newSample(scaleValue);
+        Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", millis(), getPounds(), getGrams());
 
         ret = true;
         numDroppedReadings = 0;
@@ -62,7 +62,7 @@ bool CatScale::takeReading()
     }
     else
     {
-        Serial.printlnf("%u\t drop: %.2f", millis(), reading);
+        Serial.printlnf("%u\tdrop: %.2f", millis(), newPounds);
         numDroppedReadings++;
     }
 
@@ -71,5 +71,21 @@ bool CatScale::takeReading()
 
 float CatScale::getPounds()
 {
-    return mSmoothPounds.val();
+    return getPounds(mSmoothReading.val());
+}
+
+float CatScale::getPounds(float value)
+{
+    return (value / (float)ScaleConfig::get()->calibrationFactor());
+}
+
+float CatScale::getGrams()
+{
+    return getGrams(mSmoothReading.val());
+}
+
+float CatScale::getGrams(float value)
+{
+    float calFactor = (float)ScaleConfig::get()->calibrationFactor() / GRAMS_IN_POUND;
+    return (value / calFactor);
 }

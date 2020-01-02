@@ -30,15 +30,24 @@ public:
     // Get the current reading value in pounds
     float getPounds();
 
+    // Get the current reading value in grams
+    float getGrams();
+
 private:
     // Constructor
     CatScale();
 
+    // Get the specified reading value in pounds
+    float getPounds(float value);
+
+    // Get the specified reading value in grams
+    float getGrams(float value);
+
     // HX711 scale driver
     HX711ADC mScale;
 
-    // Exponentially smoothed value (pounds)
-    ExponentiallySmoothedValue mSmoothPounds;
+    // Exponentially smoothed scale reading value
+    ExponentiallySmoothedValue mSmoothReading;
 
     // Flag to indicate the scale was just tared
     bool isTared;
