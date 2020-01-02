@@ -18,7 +18,7 @@ public:
     virtual bool takeReading(CatScale *scale);
 
     // Processes the new scale reading
-    virtual void processReading(float reading);
+    virtual void processReading(CatScale *scale);
 
     // Called by the State Manager when this state is entered
     virtual void enter();

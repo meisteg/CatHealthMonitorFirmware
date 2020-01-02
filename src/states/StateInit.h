@@ -14,7 +14,7 @@ class StateInit : public State
 public:
     String getName() override;
     bool takeReading(CatScale *scale) override;
-    void processReading(float reading) override;
+    void processReading(CatScale *scale) override;
     void enter() override;
 };
 

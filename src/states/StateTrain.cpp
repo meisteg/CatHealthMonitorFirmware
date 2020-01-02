@@ -20,8 +20,9 @@ String StateTrain::getName()
     return "TRAIN";
 }
 
-void StateTrain::processReading(float reading)
+void StateTrain::processReading(CatScale *scale)
 {
+    float reading = scale->getPounds();
     reading = roundf(reading * 10) / 10;
 
     if (reading < MIN_CAT_WEIGHT_LBS)

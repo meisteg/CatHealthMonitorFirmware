@@ -98,7 +98,7 @@ void loop()
     {
         if (state->takeReading(scale))
         {
-            state->processReading(scale->getPounds());
+            state->processReading(scale);
         }
     }
     else

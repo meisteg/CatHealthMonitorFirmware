@@ -15,8 +15,9 @@ String StateEmpty::getName()
     return "EMPTY";
 }
 
-void StateEmpty::processReading(float reading)
+void StateEmpty::processReading(CatScale *scale)
 {
+    float reading = scale->getPounds();
     reading = roundf(reading * 10) / 10;
 
     if ((reading != mPrevReading) || (reading == 0.0f))

@@ -15,8 +15,9 @@ String StateCatPossible::getName()
     return "CAT_POSSIBLE";
 }
 
-void StateCatPossible::processReading(float reading)
+void StateCatPossible::processReading(CatScale *scale)
 {
+    float reading = scale->getPounds();
     reading = roundf(reading * 10) / 10;
 
     if (reading != mPrevReading)

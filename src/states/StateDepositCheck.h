@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef STATE_DEPOSIT_CHECK_H
@@ -13,7 +13,7 @@ class StateDepositCheck : public State
 {
 public:
     String getName() override;
-    void processReading(float reading) override;
+    void processReading(CatScale *scale) override;
     void enter() override;
     void exit() override;
 

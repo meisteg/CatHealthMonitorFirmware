@@ -13,8 +13,10 @@ String StateCatPresent::getName()
     return "CAT_PRESENT";
 }
 
-void StateCatPresent::processReading(float reading)
+void StateCatPresent::processReading(CatScale *scale)
 {
+    float reading = scale->getPounds();
+
     if (reading < CAT_NOT_PRESENT_THRESHOLD)
     {
         mNumReadingsLessThanThreshold++;

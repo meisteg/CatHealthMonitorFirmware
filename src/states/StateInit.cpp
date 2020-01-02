@@ -30,7 +30,7 @@ bool StateInit::takeReading(CatScale *scale)
     return ret;
 }
 
-void StateInit::processReading(float reading)
+void StateInit::processReading(CatScale *scale)
 {
     // If we get here, the scale is properly tared. Move to next state.
     StateManager::get()->setState(StateManager::STATE_EMPTY);

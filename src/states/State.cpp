@@ -12,7 +12,7 @@ bool State::takeReading(CatScale *scale)
     return scale->takeReading();
 }
 
-void State::processReading(float reading)
+void State::processReading(CatScale *scale)
 {
     // Base class does nothing
 }

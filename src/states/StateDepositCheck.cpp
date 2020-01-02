@@ -15,8 +15,9 @@ String StateDepositCheck::getName()
     return "DEPOSIT_CHECK";
 }
 
-void StateDepositCheck::processReading(float reading)
+void StateDepositCheck::processReading(CatScale *scale)
 {
+    float reading = scale->getPounds();
     reading = roundf(reading * 10) / 10;
 
     if (reading != mPrevReading)
