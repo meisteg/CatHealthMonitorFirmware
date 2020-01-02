@@ -107,15 +107,11 @@ bool CatManager::completeTraining(float weight)
 
 void CatManager::printCatDatabase() const
 {
-    Serial.print(mCatDataBase.num_cats);
-    Serial.println(" cats trained");
+    Serial.printlnf("%u cats trained", mCatDataBase.num_cats);
 
     for (int i = 0; i < mCatDataBase.num_cats; ++i)
     {
-        Serial.print(mCatDataBase.cats[i].name);
-        Serial.print(": ");
-        Serial.print(mCatDataBase.cats[i].weight, 2);
-        Serial.println(" lbs");
+        Serial.printlnf("%s: %.2f lbs", mCatDataBase.cats[i].name, mCatDataBase.cats[i].weight);
     }
 }
 
@@ -141,15 +137,11 @@ bool CatManager::selectCatByWeight(float weight)
 
     if (mSelectedCat >= 0)
     {
-        Serial.print(mCatDataBase.cats[mSelectedCat].name);
-        Serial.println(" selected");
+        Serial.printlnf("%s selected", mCatDataBase.cats[mSelectedCat].name);
 
         if (mCatDataBase.cats[mSelectedCat].weight != weight)
         {
-            Serial.print("Updating weight to ");
-            Serial.print(weight);
-            Serial.println(" lbs");
-
+            Serial.printlnf("Updating weight to %.2f lbs", weight);
             mCatDataBase.cats[mSelectedCat].weight = weight;
         }
 

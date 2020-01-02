@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "ScaleConfig.h"
@@ -25,10 +25,8 @@ ScaleConfig::ScaleConfig()
     }
     else
     {
-        Serial.print("AIO Key: ");
-        Serial.println(aioKey());
-        Serial.print("Number of readings to be stable: ");
-        Serial.println(numReadingsForStable());
+        Serial.printlnf("AIO Key: %s", aioKey());
+        Serial.printlnf("Number of readings to be stable: %u", numReadingsForStable());
     }
 }
 

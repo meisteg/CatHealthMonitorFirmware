@@ -13,9 +13,7 @@ int catTrain(String cat_name)
     if (StateManager::get()->isState(StateManager::STATE_EMPTY) &&
         CatManager::get()->setupToTrain(cat_name))
     {
-        Serial.print("Train New Cat: ");
-        Serial.println(cat_name);
-
+        Serial.printlnf("Train New Cat: %s", cat_name.c_str());
         StateManager::get()->setState(StateManager::STATE_TRAIN);
 
         return 0;
@@ -36,9 +34,7 @@ int scaleCalibrate(String calibration)
 {
     ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
-    Serial.print("New calibration factor: ");
-    Serial.println(ScaleConfig::get()->calibrationFactor());
-
+    Serial.printlnf("New calibration factor: %d", ScaleConfig::get()->calibrationFactor());
     StateManager::get()->setState(StateManager::STATE_INIT);
 
     return 0;
@@ -49,9 +45,7 @@ int setAIOKey(String aioKey)
     if (aioKey.length() == AIO_KEY_LEN)
     {
         ScaleConfig::get()->aioKey(aioKey);
-
-        Serial.print("New AIO Key: ");
-        Serial.println(ScaleConfig::get()->aioKey());
+        Serial.printlnf("New AIO Key: %s", ScaleConfig::get()->aioKey());
 
         return 0;
     }
@@ -63,8 +57,8 @@ int setReadingsForStable(String readings)
 {
     ScaleConfig::get()->numReadingsForStable(atoi(readings.c_str()));
 
-    Serial.print("New number of readings to be stable: ");
-    Serial.println(ScaleConfig::get()->numReadingsForStable());
+    Serial.printlnf("New number of readings to be stable: %u",
+                    ScaleConfig::get()->numReadingsForStable());
 
     return 0;
 }

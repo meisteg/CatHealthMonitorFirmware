@@ -32,8 +32,7 @@ void StateDepositCheck::processReading(float reading)
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Deposit determined
-            Serial.print("Deposit: ");
-            Serial.println(reading, 1);
+            Serial.printlnf("Deposit: %.1f", reading);
             CatManager::get()->setCatLastDeposit(reading);
 
             StateManager::get()->setState(StateManager::STATE_EMPTY);

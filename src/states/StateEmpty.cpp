@@ -50,9 +50,7 @@ void StateEmpty::processReading(float reading)
                 // Scale drift, cat deposits or litter box cleaning
                 else
                 {
-                    Serial.print("Automatic tare due to non-zero reading: ");
-                    Serial.println(reading, 1);
-
+                    Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
                     StateManager::get()->setState(StateManager::STATE_INIT);
                 }
             }

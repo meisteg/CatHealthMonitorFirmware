@@ -44,8 +44,7 @@ void StateCatPresent::exit()
     mTimeEnter = 0;
     mNumReadingsLessThanThreshold = 0;
 
-    Serial.print("Duration: ");
-    Serial.println(duration);
+    Serial.printlnf("Duration: %u", duration);
     CatManager::get()->setCatLastDuration(duration);
 
     digitalWrite(PIN_LED, LOW);

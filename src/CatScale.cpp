@@ -52,12 +52,9 @@ bool CatScale::takeReading()
     // a senario where readings are dropped forever.
     if (isTared || (fabs(reading - getPounds()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
     {
-        Serial.print(millis());
-        Serial.print("\t Raw: ");
-        Serial.print(reading, 2);
+        Serial.printf("%u\t Raw: %.2f", millis(), reading);
         reading = mSmoothPounds.newSample(reading);
-        Serial.print("\t Smooth: ");
-        Serial.println(reading, 2);
+        Serial.printlnf("\t Smooth: %.2f", reading);
 
         ret = true;
         numDroppedReadings = 0;
@@ -65,10 +62,7 @@ bool CatScale::takeReading()
     }
     else
     {
-        Serial.print(millis());
-        Serial.print("\t drop: ");
-        Serial.println(reading, 2);
-
+        Serial.printlnf("%u\t drop: %.2f", millis(), reading);
         numDroppedReadings++;
     }
 
