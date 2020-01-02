@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef STATE_INIT_H
@@ -13,7 +13,7 @@ class StateInit : public State
 {
 public:
     String getName() override;
-    bool takeReading() override;
+    bool takeReading(CatScale *scale) override;
     void processReading(float reading) override;
     void enter() override;
 };

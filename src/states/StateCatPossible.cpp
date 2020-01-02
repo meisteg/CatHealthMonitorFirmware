@@ -8,7 +8,6 @@
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
-#include "CatHealthMonitor.h"
 #include "ScaleConfig.h"
 
 String StateCatPossible::getName()
@@ -66,7 +65,7 @@ void StateCatPossible::processReading(float reading)
 void StateCatPossible::enter()
 {
     mNumSameReadings = 0;
-    mInitialReading = mPrevReading = roundf(val.val() * 10) / 10;
+    mInitialReading = mPrevReading = roundf(CatScale::get()->getPounds() * 10) / 10;
 
     // Prevent OTA updates while determining if a cat is present
     System.disableUpdates();

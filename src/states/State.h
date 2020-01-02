@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef STATE_H
 #define STATE_H
 
 #include "application.h"
+#include "CatScale.h"
 
 class State
 {
@@ -14,7 +15,7 @@ public:
     virtual String getName() = 0;
 
     // Takes a new scale reading
-    virtual bool takeReading();
+    virtual bool takeReading(CatScale *scale);
 
     // Processes the new scale reading
     virtual void processReading(float reading);

@@ -2,17 +2,11 @@
  * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
-#include "ExponentiallySmoothedValue.h"
-#include "HX711ADC.h"
+#include "CatScale.h"
 #include "StateManager.h"
 #include "Constants.h"
 #include "CatManager.h"
 #include "ScaleConfig.h"
-
-// parameter "gain" is ommited; the default value 128 is used by the library
-HX711ADC scale(PIN_HX711_DOUT, PIN_HX711_CLK);
-
-ExponentiallySmoothedValue val(0.5f);
 
 int catTrain(String cat_name)
 {
@@ -45,7 +39,6 @@ int scaleCalibrate(String calibration)
     Serial.print("New calibration factor: ");
     Serial.println(ScaleConfig::get()->calibrationFactor());
 
-    scale.set_scale(ScaleConfig::get()->calibrationFactor());
     StateManager::get()->setState(StateManager::STATE_INIT);
 
     return 0;
@@ -88,8 +81,6 @@ void setup()
 
     StateManager::get()->registerVariable();
 
-    scale.begin();
-
     pinMode(PIN_LED, OUTPUT);
 
     // Wait for a USB serial connection for up to 10 seconds
@@ -98,8 +89,7 @@ void setup()
     Serial.println("Cat Health Monitor");
     CatManager::get()->printCatDatabase();
 
-    scale.set_scale(ScaleConfig::get()->calibrationFactor());
-    scale.tare(); //Reset the scale to 0
+    CatScale::get()->begin();
 
     // Publish vitals each hour
     Particle.publishVitals(3600);
@@ -108,12 +98,13 @@ void setup()
 void loop()
 {
     State *state = StateManager::get()->getState();
+    CatScale *scale = CatScale::get();
 
-    if (scale.is_ready())
+    if (scale->isReady())
     {
-        if (state->takeReading())
+        if (state->takeReading(scale))
         {
-            state->processReading(val.val());
+            state->processReading(scale->getPounds());
         }
     }
     else

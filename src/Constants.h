@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef CONSTANTS_H
@@ -58,6 +58,9 @@
 
 // Baud rate of the debug serial port
 #define SERIAL_BAUD                 115200
+
+// Time constant to use to exponentially smooth the scale readings
+#define SMOOTH_TIME_CONSTANT        0.5f
 
 // Time in milliseconds to wait before toggling the LED in training state
 #define TRAINING_LED_TOGGLE_MS      500

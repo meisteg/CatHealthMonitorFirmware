@@ -1,41 +1,15 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
 
 #include "State.h"
-#include "CatHealthMonitor.h"
-#include "Constants.h"
+#include "CatScale.h"
 
-bool State::takeReading()
+bool State::takeReading(CatScale *scale)
 {
-    static unsigned int numDroppedReadings = 0;
-    bool ret = false;
-    float reading = scale.get_units();
-
-    if ((fabs(reading - val.val()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
-    {
-        Serial.print(millis());
-        Serial.print("\t Raw: ");
-        Serial.print(reading, 2);
-        reading = val.newSample(reading);
-        Serial.print("\t Smooth: ");
-        Serial.println(reading, 2);
-
-        ret = true;
-        numDroppedReadings = 0;
-    }
-    else
-    {
-        Serial.print(millis());
-        Serial.print("\t drop: ");
-        Serial.println(reading, 2);
-
-        numDroppedReadings++;
-    }
-
-    return ret;
+    return scale->takeReading();
 }
 
 void State::processReading(float reading)

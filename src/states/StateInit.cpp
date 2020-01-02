@@ -5,7 +5,6 @@
 #include <math.h>
 
 #include "StateInit.h"
-#include "CatHealthMonitor.h"
 #include "StateManager.h"
 
 String StateInit::getName()
@@ -13,25 +12,19 @@ String StateInit::getName()
     return "INIT";
 }
 
-bool StateInit::takeReading()
+bool StateInit::takeReading(CatScale *scale)
 {
-    bool ret = false;
-    float reading = scale.get_units();
+    bool ret = scale->takeReading();
 
-    // Just tared the scale, so initial reading should be close to zero
-    if (fabs(reading) > 0.05f)
+    if (ret)
     {
-        Serial.print(millis());
-        Serial.print("\t drop: ");
-        Serial.println(reading, 2);
-
-        // Try to tare again
-        scale.tare();
-    }
-    else
-    {
-        val.newSample(reading);
-        ret = true;
+        // Just tared the scale, so initial reading should be close to zero
+        if (fabs(scale->getPounds()) > 0.05f)
+        {
+            Serial.println("Non-zero reading: Tare the scale again");
+            scale->tare();
+            ret = false;
+        }
     }
 
     return ret;
@@ -39,12 +32,11 @@ bool StateInit::takeReading()
 
 void StateInit::processReading(float reading)
 {
-    // If we get here, the scale is properly tared. More to next state.
+    // If we get here, the scale is properly tared. Move to next state.
     StateManager::get()->setState(StateManager::STATE_EMPTY);
 }
 
 void StateInit::enter()
 {
-    scale.tare();
-    val.reset();
+    CatScale::get()->tare();
 }
