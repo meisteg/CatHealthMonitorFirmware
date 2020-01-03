@@ -50,7 +50,7 @@ bool CatScale::takeReading()
     //
     // However, it is possible that a drastically different reading is valid. If multiple
     // readings in a row are dropped, assume the new reading is actually good. This prevents
-    // a senario where readings are dropped forever.
+    // a scenario where readings are dropped forever.
     if (isTared || (fabs(newPounds - getPounds()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
     {
         mSmoothReading.newSample(scaleValue);
