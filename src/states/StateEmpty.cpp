@@ -17,22 +17,43 @@ String StateEmpty::getName()
 
 void StateEmpty::processReading(CatScale *scale)
 {
-    float reading = scale->getPounds();
-    reading = roundf(reading * 10) / 10;
+    float pounds = scale->getPounds();
+    pounds = roundf(pounds * 10) / 10;
 
-    if ((reading != mPrevReading) || (reading == 0.0f))
+    if ((pounds != mPrevReadingPounds) || (pounds == 0.0f))
     {
-        mNumSameNonZeroReadings = 0;
-        mPrevReading = reading;
+        mNumSameNonZeroReadingsPounds = 0;
+        mPrevReadingPounds = pounds;
+
+        if (pounds == 0.0f)
+        {
+            // In order to have an accurate deposit check, need to have minimal scale drift.
+            float grams = roundf(scale->getGrams());
+            if ((grams != mPrevReadingGrams) || (fabs(scale->getGrams()) < 10.0f))
+            {
+                mNumSameNonZeroReadingsGrams = 0;
+                mPrevReadingGrams = grams;
+            }
+            else
+            {
+                mNumSameNonZeroReadingsGrams++;
+                if (mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable())
+                {
+                    // Scale drift, cat deposits or litter box cleaning
+                    Serial.printlnf("Automatic tare due to non-zero grams: %.0f", grams);
+                    StateManager::get()->setState(StateManager::STATE_INIT);
+                }
+            }
+        }
     }
     else
     {
-        mNumSameNonZeroReadings++;
+        mNumSameNonZeroReadingsPounds++;
 
-        if (mNumSameNonZeroReadings >= ScaleConfig::get()->numReadingsForStable())
+        if (mNumSameNonZeroReadingsPounds >= ScaleConfig::get()->numReadingsForStable())
         {
             // Is it a cat?
-            if (CatManager::get()->selectCatByWeight(reading))
+            if (CatManager::get()->selectCatByWeight(pounds))
             {
                 StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
             }
@@ -40,18 +61,18 @@ void StateEmpty::processReading(CatScale *scale)
             {
                 char publishString[64];
                 snprintf(publishString, sizeof(publishString),
-                         "{\"reading\": %.1f}", reading);
+                         "{\"reading\": %.1f}", pounds);
                 Particle.publish("stable_reading", publishString, PRIVATE);
 
                 // Is it possible to be a cat?
-                if (reading >= MIN_CAT_WEIGHT_LBS)
+                if (pounds >= MIN_CAT_WEIGHT_LBS)
                 {
                     StateManager::get()->setState(StateManager::STATE_CAT_POSSIBLE);
                 }
                 // Scale drift, cat deposits or litter box cleaning
                 else
                 {
-                    Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
+                    Serial.printlnf("Automatic tare due to non-zero pounds: %.1f", pounds);
                     StateManager::get()->setState(StateManager::STATE_INIT);
                 }
             }
@@ -61,15 +82,12 @@ void StateEmpty::processReading(CatScale *scale)
 
 void StateEmpty::enter()
 {
-    mNumSameNonZeroReadings = 0;
-    mPrevReading = 0.0f;
+    mNumSameNonZeroReadingsPounds = 0;
+    mPrevReadingPounds = 0.0f;
+
+    mNumSameNonZeroReadingsGrams = 0;
+    mPrevReadingGrams = 0.0f;
 
     // Enable OTA updates while empty
     System.enableUpdates();
-}
-
-void StateEmpty::exit()
-{
-    mNumSameNonZeroReadings = 0;
-    mPrevReading = 0.0f;
 }

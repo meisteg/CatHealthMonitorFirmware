@@ -15,11 +15,12 @@ public:
     String getName() override;
     void processReading(CatScale *scale) override;
     void enter() override;
-    void exit() override;
 
 private:
-    int mNumSameNonZeroReadings;
-    float mPrevReading;
+    int mNumSameNonZeroReadingsPounds;
+    int mNumSameNonZeroReadingsGrams;
+    float mPrevReadingPounds;
+    float mPrevReadingGrams;
 };
 
 #endif
