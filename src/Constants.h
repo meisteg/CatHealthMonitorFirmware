@@ -44,6 +44,9 @@
 // Maximum number of cats that can be stored
 #define MAX_NUM_CATS                5
 
+// Pin to pull up when debug mode is desired
+#define PIN_DEBUG_MODE              D5
+
 // Pins used to communicate with the HX711
 #define PIN_HX711_DOUT              D3
 #define PIN_HX711_CLK               D2

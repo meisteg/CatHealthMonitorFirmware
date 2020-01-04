@@ -27,6 +27,9 @@ public:
     // Takes a new scale reading
     bool takeReading();
 
+    // FOR DEBUG ONLY: Set a new value for the scale reading
+    bool setReading(double reading);
+
     // Get the current reading value in pounds
     float getPounds();
 
@@ -57,6 +60,9 @@ private:
 
     // The previous scale reading. Not valid after tare (use isTared to check if valid).
     double mPrevScaleReading;
+
+    // Flag to indicate debug mode. In debug mode, the HX711 is not used.
+    bool mDebugMode;
 };
 
 #endif

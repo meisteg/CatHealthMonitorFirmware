@@ -25,7 +25,9 @@ ScaleConfig::ScaleConfig()
     }
     else
     {
+#if USE_ADAFRUIT_IO
         Serial.printlnf("AIO Key: %s", aioKey());
+#endif
         Serial.printlnf("Number of readings to be stable: %u", numReadingsForStable());
     }
 }

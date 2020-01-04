@@ -76,6 +76,7 @@ void setup()
     StateManager::get()->registerVariable();
 
     pinMode(PIN_LED, OUTPUT);
+    pinMode(PIN_DEBUG_MODE, INPUT_PULLDOWN);
 
     // Wait for a USB serial connection for up to 10 seconds
     // waitFor(Serial.isConnected, 10000);
