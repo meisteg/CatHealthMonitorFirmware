@@ -51,6 +51,12 @@ private:
 
     // Flag to indicate the scale was just tared
     bool isTared;
+
+    // Time of the last reading in milliseconds
+    system_tick_t mLastReadingMillis;
+
+    // The previous scale reading. Not valid after tare (use isTared to check if valid).
+    double mPrevScaleReading;
 };
 
 #endif

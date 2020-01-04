@@ -12,7 +12,8 @@ CatScale* CatScale::get()
     return &catScale;
 }
 
-CatScale::CatScale() : mScale(PIN_HX711_DOUT, PIN_HX711_CLK), mSmoothReading(SMOOTH_TIME_CONSTANT), isTared(false)
+CatScale::CatScale() : mScale(PIN_HX711_DOUT, PIN_HX711_CLK), mSmoothReading(SMOOTH_TIME_CONSTANT),
+                       isTared(false), mLastReadingMillis(0), mPrevScaleReading(0)
 {
     // Nothing to do
 }
@@ -37,34 +38,33 @@ bool CatScale::isReady()
 
 bool CatScale::takeReading()
 {
-    static unsigned int numDroppedReadings = 0;
     bool ret = false;
+    system_tick_t now = millis();
     double scaleValue = mScale.get_value();
-    float newPounds = getPounds(scaleValue);
 
     // If the scale was just tared, there is not a previous reading to compare against.
     // Simply take the reading in that case.
-    //
-    // If not just tared, verify the reading is reasonable by comparing against previous
-    // reading. Drop readings that are drastically different than the previous reading.
-    //
-    // However, it is possible that a drastically different reading is valid. If multiple
-    // readings in a row are dropped, assume the new reading is actually good. This prevents
-    // a scenario where readings are dropped forever.
-    if (isTared || (fabs(newPounds - getPounds()) < MAX_LBS_CHANGE) || (numDroppedReadings >= 5))
+    if (!isTared)
     {
-        mSmoothReading.newSample(scaleValue);
-        Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", millis(), getPounds(), getGrams());
+        // When a bad reading occurs, the HX711 takes much longer to be ready for the
+        // next reading. If there is a large gap between readings, it is safe to say
+        // the previous reading is garbage.
+        if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
+        {
+            Serial.printlnf("%u\tDropping bad reading: %.2f pounds", now, getPounds(mPrevScaleReading));
+        }
+        // Previous reading should be good
+        else
+        {
+            mSmoothReading.newSample(mPrevScaleReading);
+            Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(), getGrams());
+            ret = true;
+        }
+    }
 
-        ret = true;
-        numDroppedReadings = 0;
-        isTared = false;
-    }
-    else
-    {
-        Serial.printlnf("%u\tdrop: %.2f", millis(), newPounds);
-        numDroppedReadings++;
-    }
+    isTared = false;
+    mLastReadingMillis = now;
+    mPrevScaleReading = scaleValue;
 
     return ret;
 }

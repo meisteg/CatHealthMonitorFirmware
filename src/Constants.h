@@ -36,9 +36,10 @@
 // Maximum amount a cat's weight can change between visits
 #define MAX_CAT_WEIGHT_CHANGE       0.30f
 
-// Maximum change allowed between readings. If greater than this value,
-// assume it is a bad reading and throw it away.
-#define MAX_LBS_CHANGE              20.0f
+// Maximum number of milliseconds allowed between readings. If the previous reading
+// occurs more than this number of milliseconds in the past, assume it is a bad
+// reading and throw it away.
+#define MAX_MS_BETWEEN_READINGS     200
 
 // Maximum number of cats that can be stored
 #define MAX_NUM_CATS                5
