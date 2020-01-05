@@ -31,32 +31,46 @@ void StateCatPossible::processReading(CatScale *scale)
 
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
-            // Is it now a cat?
-            if (CatManager::get()->selectCatByWeight(reading))
-            {
-                StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
-            }
-            else
-            {
-                char publishString[64];
-                snprintf(publishString, sizeof(publishString),
-                         "{\"reading\": %.1f}", reading);
-                Particle.publish("stable_reading", publishString, PRIVATE);
+            stableReading(reading);
+        }
+    }
+}
 
-                // Is it still possible to be a cat?
-                if ((reading >= MIN_CAT_WEIGHT_LBS) && (reading != mInitialReading))
-                {
-                    // Wait some more time
-                    mNumSameReadings = 0;
-                    mInitialReading = mPrevReading;
-                }
-                // Scale drift, cat deposits or litter box cleaning
-                else
-                {
-                    Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
-                    StateManager::get()->setState(StateManager::STATE_INIT);
-                }
-            }
+void StateCatPossible::stableReading(float reading)
+{
+    // Is it now a cat?
+    if (CatManager::get()->selectCatByWeight(reading))
+    {
+        StateManager::get()->setState(StateManager::STATE_CAT_PRESENT);
+    }
+    // Not yet a known cat
+    else
+    {
+        system_tick_t now = millis();
+
+        // Only publish new stable reading if different than the previously published reading
+        if (reading != mInitialReading)
+        {
+            char publishString[32];
+            snprintf(publishString, sizeof(publishString),
+                     "{\"reading\": %.1f}", reading);
+            Particle.publish("stable_reading", publishString, PRIVATE);
+
+            mTimeStable = now;
+        }
+
+        // Is it still possible to be a cat?
+        if ((reading >= MIN_CAT_WEIGHT_LBS) && ((now - mTimeStable) < CAT_POSSIBLE_TIMEOUT_MS))
+        {
+            // Wait some more time
+            mNumSameReadings = 0;
+            mInitialReading = mPrevReading;
+        }
+        // Scale drift, cat deposits or litter box cleaning
+        else
+        {
+            Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
+            StateManager::get()->setState(StateManager::STATE_INIT);
         }
     }
 }
@@ -65,6 +79,7 @@ void StateCatPossible::enter()
 {
     mNumSameReadings = 0;
     mInitialReading = mPrevReading = roundf(CatScale::get()->getPounds() * 10) / 10;
+    mTimeStable = millis();
 
     // Prevent OTA updates while determining if a cat is present
     System.disableUpdates();

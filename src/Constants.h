@@ -20,6 +20,9 @@
 // Weight used to determine that a cat is no longer present
 #define CAT_NOT_PRESENT_THRESHOLD   1.0f
 
+// Time in milliseconds to wait in CAT_POSSIBLE state with a stable reading
+#define CAT_POSSIBLE_TIMEOUT_MS     30000
+
 // Number of Grams in a Pound
 #define GRAMS_IN_POUND              453.592f
 

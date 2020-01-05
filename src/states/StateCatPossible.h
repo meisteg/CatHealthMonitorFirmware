@@ -17,9 +17,12 @@ public:
     void enter() override;
 
 private:
+    void stableReading(float reading);
+
     int mNumSameReadings;
     float mPrevReading;
     float mInitialReading;
+    system_tick_t mTimeStable;
 };
 
 #endif
