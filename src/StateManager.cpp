@@ -10,7 +10,7 @@ StateManager* StateManager::get()
     return &stateManager;
 }
 
-StateManager::StateManager() : mStateCurrent(STATE_INIT)
+StateManager::StateManager() : mStateCurrent(STATE_TARE)
 {
     // Nothing to do
 }

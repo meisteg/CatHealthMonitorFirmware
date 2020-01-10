@@ -2,14 +2,14 @@
  * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
-#ifndef STATE_INIT_H
-#define STATE_INIT_H
+#ifndef STATE_TARE_H
+#define STATE_TARE_H
 
 #include "application.h"
 
 #include "State.h"
 
-class StateInit : public State
+class StateTare : public State
 {
 public:
     String getName() override;

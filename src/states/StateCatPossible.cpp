@@ -70,7 +70,7 @@ void StateCatPossible::stableReading(float reading)
         else
         {
             Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
-            StateManager::get()->setState(StateManager::STATE_INIT);
+            StateManager::get()->setState(StateManager::STATE_TARE);
         }
     }
 }

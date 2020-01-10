@@ -10,7 +10,7 @@
 #include "states/StateCatPresent.h"
 #include "states/StateTrain.h"
 #include "states/StateEmpty.h"
-#include "states/StateInit.h"
+#include "states/StateTare.h"
 #include "states/State.h"
 #include "states/StateDepositCheck.h"
 #include "states/StateCatPossible.h"
@@ -21,7 +21,7 @@ public:
     // List of states of the state machine
     enum
     {
-        STATE_INIT,
+        STATE_TARE,
         STATE_EMPTY,
         STATE_TRAIN,
         STATE_CAT_PRESENT,
@@ -59,7 +59,7 @@ private:
 
     // Array of state objects
     State* mStates[STATE__MAX] = {
-        new StateInit(),
+        new StateTare(),
         new StateEmpty(),
         new StateTrain(),
         new StateCatPresent(),

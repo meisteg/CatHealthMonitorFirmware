@@ -4,15 +4,15 @@
 
 #include <math.h>
 
-#include "StateInit.h"
+#include "StateTare.h"
 #include "StateManager.h"
 
-String StateInit::getName()
+String StateTare::getName()
 {
-    return "INIT";
+    return "TARE";
 }
 
-bool StateInit::takeReading(CatScale *scale)
+bool StateTare::takeReading(CatScale *scale)
 {
     bool ret = scale->takeReading();
 
@@ -30,13 +30,13 @@ bool StateInit::takeReading(CatScale *scale)
     return ret;
 }
 
-void StateInit::processReading(CatScale *scale)
+void StateTare::processReading(CatScale *scale)
 {
     // If we get here, the scale is properly tared. Move to next state.
     StateManager::get()->setState(StateManager::STATE_EMPTY);
 }
 
-void StateInit::enter()
+void StateTare::enter()
 {
     CatScale::get()->tare();
 }

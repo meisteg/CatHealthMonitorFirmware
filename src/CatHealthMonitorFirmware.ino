@@ -35,7 +35,7 @@ int scaleCalibrate(String calibration)
     ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
     Serial.printlnf("New calibration factor: %d", ScaleConfig::get()->calibrationFactor());
-    StateManager::get()->setState(StateManager::STATE_INIT);
+    StateManager::get()->setState(StateManager::STATE_TARE);
 
     return 0;
 }

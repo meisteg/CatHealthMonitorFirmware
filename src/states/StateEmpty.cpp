@@ -29,7 +29,7 @@ void StateEmpty::processReading(CatScale *scale)
         {
             // In order to have an accurate deposit check, need to have minimal scale drift.
             float grams = roundf(scale->getGrams());
-            if ((grams != mPrevReadingGrams) || (fabs(scale->getGrams()) < 10.0f))
+            if ((grams != mPrevReadingGrams) || (fabs(scale->getGrams()) < 8.0f))
             {
                 mNumSameNonZeroReadingsGrams = 0;
                 mPrevReadingGrams = grams;
@@ -41,7 +41,7 @@ void StateEmpty::processReading(CatScale *scale)
                 {
                     // Scale drift, cat deposits or litter box cleaning
                     Serial.printlnf("Automatic tare due to non-zero grams: %.0f", grams);
-                    StateManager::get()->setState(StateManager::STATE_INIT);
+                    StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }
         }
@@ -73,7 +73,7 @@ void StateEmpty::processReading(CatScale *scale)
                 else
                 {
                     Serial.printlnf("Automatic tare due to non-zero pounds: %.1f", pounds);
-                    StateManager::get()->setState(StateManager::STATE_INIT);
+                    StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }
         }
