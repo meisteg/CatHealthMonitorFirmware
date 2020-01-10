@@ -35,7 +35,7 @@ void StateDepositCheck::processReading(CatScale *scale)
             Serial.printlnf("Deposit: %.0f", reading);
             CatManager::get()->setCatLastDeposit(reading);
 
-            StateManager::get()->setState(StateManager::STATE_EMPTY);
+            StateManager::get()->setState(StateManager::STATE_TARE);
         }
     }
 }
