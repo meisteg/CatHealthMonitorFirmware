@@ -38,10 +38,16 @@ public:
     // Returns true if cat selected, false if no cat with that weight found
     bool selectCatByWeight(float weight);
 
-    // Sets the duration (in milliseconds) of the selected cat's last visit
+    // Sets the weight for the selected cat.
+    // Returns false if no cat selected.
+    bool setCatWeight(float weight);
+
+    // Sets the duration (in milliseconds) of the selected cat's last visit.
+    // Returns false if no cat selected.
     bool setCatLastDuration(uint32_t duration);
 
-    // Sets the amount of deposit for the selected cat's last visit
+    // Sets the amount of deposit for the selected cat's last visit.
+    // Returns false if no cat selected.
     bool setCatLastDeposit(float deposit);
 
     // Publish event for selected cat's visit

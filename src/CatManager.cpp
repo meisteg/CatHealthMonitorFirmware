@@ -138,15 +138,24 @@ bool CatManager::selectCatByWeight(float weight)
     if (mSelectedCat >= 0)
     {
         Serial.printlnf("%s selected", mCatDataBase.cats[mSelectedCat].name);
+        setCatWeight(weight);
 
+        return true;
+    }
+
+    return false;
+}
+
+bool CatManager::setCatWeight(float weight)
+{
+    if (mSelectedCat >= 0)
+    {
         if (mCatDataBase.cats[mSelectedCat].weight != weight)
         {
             Serial.printlnf("Updating weight to %.2f lbs", weight);
             mCatDataBase.cats[mSelectedCat].weight = weight;
+            EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
         }
-
-        mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
-        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
         return true;
     }
@@ -159,6 +168,7 @@ bool CatManager::setCatLastDuration(uint32_t duration)
     if (mSelectedCat >= 0)
     {
         mCatDataBase.cats[mSelectedCat].last_duration = duration;
+        mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
         return true;
