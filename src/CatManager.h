@@ -38,6 +38,9 @@ public:
     // Returns true if cat selected, false if no cat with that weight found
     bool selectCatByWeight(float weight);
 
+    // Deselects selected cat (if any). Will lose any unsaved changes to cat.
+    void deselectCat();
+
     // Sets the weight for the selected cat.
     // Returns false if no cat selected.
     bool setCatWeight(float weight);
@@ -56,6 +59,9 @@ public:
 private:
     // Constructor
     CatManager();
+
+    // Reads cat database from the EEPROM
+    void readCatDatabase();
 
     struct CatDataBaseEntry
     {

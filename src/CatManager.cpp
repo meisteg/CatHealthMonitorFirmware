@@ -21,6 +21,15 @@ CatManager::CatManager() : mSelectedCat(-1), mAIOClient(mTCPClient, ScaleConfig:
 CatManager::CatManager() : mSelectedCat(-1)
 #endif
 {
+    readCatDatabase();
+
+#if USE_ADAFRUIT_IO
+    mAIOClient.begin();
+#endif
+}
+
+void CatManager::readCatDatabase()
+{
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
     {
@@ -29,10 +38,6 @@ CatManager::CatManager() : mSelectedCat(-1)
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
-
-#if USE_ADAFRUIT_IO
-    mAIOClient.begin();
-#endif
 }
 
 void CatManager::reset()
@@ -146,6 +151,14 @@ bool CatManager::selectCatByWeight(float weight)
     return false;
 }
 
+void CatManager::deselectCat()
+{
+    mSelectedCat = -1;
+
+    // In case changes were made to the selected cat, restore data from cat database.
+    readCatDatabase();
+}
+
 bool CatManager::setCatWeight(float weight)
 {
     if (mSelectedCat >= 0)
@@ -154,7 +167,6 @@ bool CatManager::setCatWeight(float weight)
         {
             Serial.printlnf("Updating weight to %.2f lbs", weight);
             mCatDataBase.cats[mSelectedCat].weight = weight;
-            EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
         }
 
         return true;
@@ -169,7 +181,6 @@ bool CatManager::setCatLastDuration(uint32_t duration)
     {
         mCatDataBase.cats[mSelectedCat].last_duration = duration;
         mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
-        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
         return true;
     }
@@ -182,8 +193,6 @@ bool CatManager::setCatLastDeposit(float deposit)
     if (mSelectedCat >= 0)
     {
         mCatDataBase.cats[mSelectedCat].last_deposit = deposit;
-        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
-
         return true;
     }
 
@@ -202,6 +211,9 @@ bool CatManager::publishCatVisit()
 
     if (mSelectedCat >= 0)
     {
+        // Save any updates to cat database
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
         entry = &(mCatDataBase.cats[mSelectedCat]);
 
         int duration_sec = ((entry->last_duration + 500) / 1000);
