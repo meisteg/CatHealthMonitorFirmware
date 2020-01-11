@@ -38,6 +38,10 @@ public:
     // Returns true if cat selected, false if no cat with that weight found
     bool selectCatByWeight(float weight);
 
+    // Updates cat selection if the specified weight indicates another cat.
+    // Returns true if the cat selection changed, false if not.
+    bool changeSelectedCatIfNecessary(float weight);
+
     // Deselects selected cat (if any). Will lose any unsaved changes to cat.
     void deselectCat();
 

@@ -15,7 +15,7 @@ String StateCatPresent::getName()
 
 void StateCatPresent::processReading(CatScale *scale)
 {
-    float reading = scale->getPounds(false);
+    float reading = scale->getPounds(true);
 
     if (reading < CAT_NOT_PRESENT_THRESHOLD)
     {
@@ -27,12 +27,38 @@ void StateCatPresent::processReading(CatScale *scale)
             StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);
         }
     }
+    else
+    {
+        mNumReadingsLessThanThreshold = 0;
+
+        // If is possible if a cat enters just right (slowly), a heavier cat can
+        // falsely be detected as a lighter cat. As a result, while cat is present,
+        // verify the selected cat is still correct, and if not, update the selection
+        // as necessary. Only do this is the new weight is higher than the initial
+        // weight to prevent introducing the same bug for cat exit.
+        if ((mMinReading > reading) || (reading != mPrevReading))
+        {
+            mNumSameReadings = 0;
+            mPrevReading = reading;
+        }
+        else if (mNumSameReadings++ >= ScaleConfig::get()->numReadingsForStable())
+        {
+            if (CatManager::get()->changeSelectedCatIfNecessary(reading))
+            {
+                // Lock in heavier weight to prevent selecting lighter cat on exit
+                mMinReading = reading;
+            }
+            mNumSameReadings = 0;
+        }
+    }
 }
 
 void StateCatPresent::enter()
 {
     mTimeEnter = millis();
     mNumReadingsLessThanThreshold = 0;
+    mNumSameReadings = 0;
+    mMinReading = mPrevReading = CatScale::get()->getPounds(true);
 
     digitalWrite(PIN_LED, HIGH);
 
@@ -43,8 +69,6 @@ void StateCatPresent::enter()
 void StateCatPresent::exit()
 {
     system_tick_t duration = millis() - mTimeEnter;
-    mTimeEnter = 0;
-    mNumReadingsLessThanThreshold = 0;
 
     Serial.printlnf("Duration: %u", duration);
     CatManager::get()->setCatLastDuration(duration);

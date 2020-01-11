@@ -20,6 +20,9 @@ public:
 private:
     system_tick_t mTimeEnter;
     int mNumReadingsLessThanThreshold;
+    int mNumSameReadings;
+    float mPrevReading;
+    float mMinReading;
 };
 
 #endif

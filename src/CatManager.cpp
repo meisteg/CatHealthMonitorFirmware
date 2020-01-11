@@ -122,7 +122,7 @@ void CatManager::printCatDatabase() const
 
 bool CatManager::selectCatByWeight(float weight)
 {
-    mSelectedCat = -1;
+    deselectCat();
 
     for (int i = 0; i < mCatDataBase.num_cats; ++i)
     {
@@ -149,6 +149,22 @@ bool CatManager::selectCatByWeight(float weight)
     }
 
     return false;
+}
+
+bool CatManager::changeSelectedCatIfNecessary(float weight)
+{
+    bool ret = false;
+
+    for (int i = 0; i < mCatDataBase.num_cats; ++i)
+    {
+        if ((mSelectedCat != i) && (fabs(mCatDataBase.cats[i].weight - weight) <= MAX_CAT_WEIGHT_CHANGE))
+        {
+            ret = selectCatByWeight(weight);
+            break;
+        }
+    }
+
+    return ret;
 }
 
 void CatManager::deselectCat()
