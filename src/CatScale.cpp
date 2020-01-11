@@ -65,7 +65,7 @@ bool CatScale::takeReading()
         scaleValue = mPrevScaleReading;
 
         mSmoothReading.newSample(scaleValue);
-        Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(), getGrams());
+        Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
         ret = true;
     }
     else
@@ -81,13 +81,13 @@ bool CatScale::takeReading()
             // the previous reading is garbage.
             if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
             {
-                Serial.printlnf("%u\tDropping bad reading: %.2f pounds", now, getPounds(mPrevScaleReading));
+                Serial.printlnf("%u\tDropping bad reading: %.2f pounds", now, getPounds((float)mPrevScaleReading));
             }
             // Previous reading should be good
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(), getGrams());
+                Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
                 ret = true;
             }
         }
@@ -111,9 +111,16 @@ bool CatScale::setReading(double reading)
     return false;
 }
 
-float CatScale::getPounds()
+float CatScale::getPounds(bool round)
 {
-    return getPounds(mSmoothReading.val());
+    float pounds = getPounds(mSmoothReading.val());
+
+    if (round)
+    {
+        pounds = roundf(pounds * 10) / 10;
+    }
+
+    return pounds;
 }
 
 float CatScale::getPounds(float value)
@@ -121,9 +128,16 @@ float CatScale::getPounds(float value)
     return (value / (float)ScaleConfig::get()->calibrationFactor());
 }
 
-float CatScale::getGrams()
+float CatScale::getGrams(bool round)
 {
-    return getGrams(mSmoothReading.val());
+    float grams = getGrams(mSmoothReading.val());
+
+    if (round)
+    {
+        grams = roundf(grams);
+    }
+
+    return grams;
 }
 
 float CatScale::getGrams(float value)

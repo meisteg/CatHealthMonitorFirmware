@@ -17,8 +17,7 @@ String StateCatPossible::getName()
 
 void StateCatPossible::processReading(CatScale *scale)
 {
-    float reading = scale->getPounds();
-    reading = roundf(reading * 10) / 10;
+    float reading = scale->getPounds(true);
 
     if (reading != mPrevReading)
     {
@@ -78,7 +77,7 @@ void StateCatPossible::stableReading(float reading)
 void StateCatPossible::enter()
 {
     mNumSameReadings = 0;
-    mInitialReading = mPrevReading = roundf(CatScale::get()->getPounds() * 10) / 10;
+    mInitialReading = mPrevReading = CatScale::get()->getPounds(true);
     mTimeStable = millis();
 
     // Prevent OTA updates while determining if a cat is present

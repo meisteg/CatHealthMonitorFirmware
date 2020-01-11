@@ -17,8 +17,7 @@ String StateEmpty::getName()
 
 void StateEmpty::processReading(CatScale *scale)
 {
-    float pounds = scale->getPounds();
-    pounds = roundf(pounds * 10) / 10;
+    float pounds = scale->getPounds(true);
 
     if ((pounds != mPrevReadingPounds) || (pounds == 0.0f))
     {
@@ -28,8 +27,8 @@ void StateEmpty::processReading(CatScale *scale)
         if (pounds == 0.0f)
         {
             // In order to have an accurate deposit check, need to have minimal scale drift.
-            float grams = roundf(scale->getGrams());
-            if ((grams != mPrevReadingGrams) || (fabs(scale->getGrams()) < 8.0f))
+            float grams = scale->getGrams(true);
+            if ((grams != mPrevReadingGrams) || (fabs(grams) < 8.0f))
             {
                 mNumSameNonZeroReadingsGrams = 0;
                 mPrevReadingGrams = grams;

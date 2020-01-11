@@ -15,7 +15,7 @@ String StateCatPresent::getName()
 
 void StateCatPresent::processReading(CatScale *scale)
 {
-    float reading = scale->getPounds();
+    float reading = scale->getPounds(false);
 
     if (reading < CAT_NOT_PRESENT_THRESHOLD)
     {

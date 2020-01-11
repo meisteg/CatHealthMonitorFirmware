@@ -31,10 +31,10 @@ public:
     bool setReading(double reading);
 
     // Get the current reading value in pounds
-    float getPounds();
+    float getPounds(bool round);
 
     // Get the current reading value in grams
-    float getGrams();
+    float getGrams(bool round);
 
 private:
     // Constructor

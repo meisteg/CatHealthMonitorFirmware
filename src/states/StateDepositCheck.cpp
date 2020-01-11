@@ -17,7 +17,7 @@ String StateDepositCheck::getName()
 
 void StateDepositCheck::processReading(CatScale *scale)
 {
-    float reading = roundf(scale->getGrams());
+    float reading = scale->getGrams(true);
 
     if (fabs(reading - mPrevReading) > 2.0f)
     {
