@@ -24,6 +24,10 @@ void StateCatPresent::processReading(CatScale *scale)
         if (mNumReadingsLessThanThreshold >= ScaleConfig::get()->numReadingsForStable())
         {
             // Cat is no longer present
+            system_tick_t duration = millis() - mTimeEnter;
+            Serial.printlnf("Duration: %u", duration);
+            CatManager::get()->setCatLastDuration(duration);
+
             StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);
         }
     }
@@ -68,10 +72,15 @@ void StateCatPresent::enter()
 
 void StateCatPresent::exit()
 {
-    system_tick_t duration = millis() - mTimeEnter;
-
-    Serial.printlnf("Duration: %u", duration);
-    CatManager::get()->setCatLastDuration(duration);
-
     digitalWrite(PIN_LED, LOW);
+}
+
+void StateCatPresent::loop()
+{
+    if ((millis() - mTimeEnter) > MAX_CAT_PRESENT_TIME_MS)
+    {
+        // Been in this state too long, so a cat probably isn't present
+        CatManager::get()->deselectCat();
+        StateManager::get()->setState(StateManager::STATE_TARE);
+    }
 }

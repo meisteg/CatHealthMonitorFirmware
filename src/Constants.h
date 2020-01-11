@@ -47,6 +47,10 @@
 // Maximum number of cats that can be stored
 #define MAX_NUM_CATS                5
 
+// Maximum time allowed in CAT_PRESENT state. Used to detect situation where amount
+// of litter added matches a cat's weight.
+#define MAX_CAT_PRESENT_TIME_MS     600000
+
 // Pin to pull up when debug mode is desired
 #define PIN_DEBUG_MODE              D5
 

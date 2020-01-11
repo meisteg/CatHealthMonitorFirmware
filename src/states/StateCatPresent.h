@@ -16,6 +16,7 @@ public:
     void processReading(CatScale *scale) override;
     void enter() override;
     void exit() override;
+    void loop() override;
 
 private:
     system_tick_t mTimeEnter;
