@@ -82,7 +82,7 @@ void setup()
     // waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
-    CatManager::get()->printCatDatabase();
+    CatManager::get()->publishCatDatabase(CatManager::NETWORK_CLOUD);
 
     CatScale::get()->begin();
 

@@ -14,6 +14,14 @@
 class CatManager
 {
 public:
+    // Choice of networks to publish the cat database
+    enum publish_network
+    {
+        NETWORK_LOCAL,
+        NETWORK_CLOUD,
+        NETWORK_BOTH
+    };
+
     // Get the CatManager singleton
     static CatManager* get();
 
@@ -31,8 +39,8 @@ public:
     // Returns true on success, and false if weight matches existing cat
     bool completeTraining(float weight);
 
-    // Prints the cat database to the serial console
-    void printCatDatabase() const;
+    // Publish the cat database to the specified network
+    bool publishCatDatabase(publish_network network = NETWORK_BOTH) const;
 
     // Selects a cat in the database with the specified weight (ish)
     // Returns true if cat selected, false if no cat with that weight found
@@ -78,8 +86,19 @@ private:
 
     struct CatDataBase
     {
+        // Magic number used to verify that database has been initialized
         uint32_t magic;
+
+        // Number of cats in the database
         uint8_t num_cats;
+
+        // Version of the database schema
+        uint8_t version;
+
+        // Reserved for future use
+        uint16_t reserved;
+
+        // Cat entries
         CatDataBaseEntry cats[MAX_NUM_CATS];
     };
 

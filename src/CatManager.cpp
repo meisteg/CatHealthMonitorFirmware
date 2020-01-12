@@ -36,6 +36,7 @@ void CatManager::readCatDatabase()
         Serial.println("CatManager: EEPROM was empty or invalid");
         mCatDataBase.magic = CAT_MAGIC_NUMBER;
         mCatDataBase.num_cats = 0;
+        mCatDataBase.version = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
 }
@@ -47,6 +48,8 @@ void CatManager::reset()
         mCatDataBase.num_cats = 0;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
         mSelectedCat = -1;
+
+        publishCatDatabase();
     }
     else
     {
@@ -104,20 +107,49 @@ bool CatManager::completeTraining(float weight)
         mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
-        printCatDatabase();
+        publishCatDatabase();
     }
 
     return ret;
 }
 
-void CatManager::printCatDatabase() const
+bool CatManager::publishCatDatabase(publish_network network) const
 {
-    Serial.printlnf("%u cats trained", mCatDataBase.num_cats);
+    char publish[512];
+    char entry[80];
+    bool ret = false;
+
+    snprintf(publish, sizeof(publish), "{\"num_cats\":%u, \"version\":%u, \"cats\":{",
+             mCatDataBase.num_cats, mCatDataBase.version);
 
     for (int i = 0; i < mCatDataBase.num_cats; ++i)
     {
-        Serial.printlnf("%s: %.2f lbs", mCatDataBase.cats[i].name, mCatDataBase.cats[i].weight);
+        snprintf(entry, sizeof(entry), "%s\"%s\":{\"weight\":%.1f,\"last_visit\":%ld}",
+                 (i > 0) ? ", " : "", mCatDataBase.cats[i].name, mCatDataBase.cats[i].weight, mCatDataBase.cats[i].last_visit);
+        strncat(publish, entry, sizeof(publish) - strlen(publish));
     }
+
+    strncat(publish, "}}", sizeof(publish) - strlen(publish));
+    Serial.println(publish);
+
+    switch (network)
+    {
+        case NETWORK_CLOUD:
+            ret = Particle.publish("cat_database", publish, PRIVATE);
+            break;
+
+        case NETWORK_LOCAL:
+            ret = (Mesh.publish("cat_database", publish) == 0);
+            break;
+
+        case NETWORK_BOTH:
+        default:
+            ret = Particle.publish("cat_database", publish, PRIVATE);
+            ret &= (Mesh.publish("cat_database", publish) == 0);
+            break;
+    }
+
+    return ret;
 }
 
 bool CatManager::selectCatByWeight(float weight)
