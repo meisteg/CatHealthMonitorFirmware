@@ -106,4 +106,10 @@ void loop()
     {
         state->loop();
     }
+
+    // Ensure the time stays sync'd with the cloud
+    if (((millis() - Particle.timeSyncedLast()) > TIME_SYNC_MILLIS) && Particle.syncTimeDone())
+    {
+        Particle.syncTime();
+    }
 }

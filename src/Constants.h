@@ -76,6 +76,9 @@
 // Time constant to use to exponentially smooth the scale readings
 #define SMOOTH_TIME_CONSTANT        0.5f
 
+// Time will be sync'd with the cloud if last sync was at least this long ago in milliseconds
+#define TIME_SYNC_MILLIS            (24 * 60 * 60 * 1000)
+
 // Time in milliseconds to wait before toggling the LED in training state
 #define TRAINING_LED_TOGGLE_MS      500
 
