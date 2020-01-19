@@ -21,6 +21,7 @@ ScaleConfig::ScaleConfig()
         mScaleCfg.calibration_factor = CALIBRATION_FACTOR_INIT;
         // mScaleCfg.aio_key intentionally not set
         mScaleCfg.num_readings_for_stable = READINGS_TO_BE_STABLE_INIT;
+        mScaleCfg.no_visit_alert_time = NO_VISIT_ALERT_TIME_INIT;
         save();
     }
     else
@@ -30,6 +31,7 @@ ScaleConfig::ScaleConfig()
 #endif
         Serial.printlnf("Calibration factor: %d", calibrationFactor());
         Serial.printlnf("Number of readings to be stable: %u", numReadingsForStable());
+        Serial.printlnf("No visit alert time (0 to disable): %u seconds", noVisitAlertTime());
     }
 }
 
@@ -68,5 +70,18 @@ uint8_t ScaleConfig::numReadingsForStable()
 void ScaleConfig::numReadingsForStable(uint8_t readings)
 {
     mScaleCfg.num_readings_for_stable = readings;
+    save();
+}
+
+uint32_t ScaleConfig::noVisitAlertTime()
+{
+    return mScaleCfg.no_visit_alert_time;
+}
+
+void ScaleConfig::noVisitAlertTime(uint32_t secs)
+{
+    // NOTE: Setting a larger time will not resend an alert if an alert was
+    // already sent for a cat. The cat must visit to reset the alert.
+    mScaleCfg.no_visit_alert_time = secs;
     save();
 }

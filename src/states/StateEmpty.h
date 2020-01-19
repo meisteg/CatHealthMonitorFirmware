@@ -15,6 +15,7 @@ public:
     String getName() override;
     void processReading(CatScale *scale) override;
     void enter() override;
+    void loop() override;
 
 private:
     int mNumSameNonZeroReadingsPounds;

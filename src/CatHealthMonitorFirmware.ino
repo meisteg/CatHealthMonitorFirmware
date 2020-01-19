@@ -63,6 +63,16 @@ int setReadingsForStable(String readings)
     return 0;
 }
 
+int setNoVisitAlert(String secs)
+{
+    ScaleConfig::get()->noVisitAlertTime(atoi(secs.c_str()));
+
+    Serial.printlnf("New no visit alert time: %u seconds",
+                    ScaleConfig::get()->noVisitAlertTime());
+
+    return 0;
+}
+
 void setup()
 {
     Serial.begin(SERIAL_BAUD);
@@ -72,6 +82,7 @@ void setup()
     Particle.function("calibration", scaleCalibrate);
     Particle.function("aio_key", setAIOKey);
     Particle.function("readings_for_stable", setReadingsForStable);
+    Particle.function("no_visit_alert", setNoVisitAlert);
 
     StateManager::get()->registerVariable();
 
@@ -82,6 +93,7 @@ void setup()
     // waitFor(Serial.isConnected, 10000);
 
     Serial.println("Cat Health Monitor");
+    Serial.printlnf("Build date/time: %s %s", __DATE__, __TIME__);
     CatManager::get()->publishCatDatabase(CatManager::NETWORK_CLOUD);
 
     CatScale::get()->begin();

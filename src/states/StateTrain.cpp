@@ -50,7 +50,7 @@ void StateTrain::processReading(CatScale *scale)
             if (!CatManager::get()->completeTraining(reading))
             {
                 Serial.println("ERROR: Failed to complete training");
-                Particle.publish("cat_error", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
+                Particle.publish("cat_alert", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
             }
 
             // Advance to next state

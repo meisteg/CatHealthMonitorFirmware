@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef SCALE_CONFIG_H
@@ -22,6 +22,9 @@ public:
     uint8_t numReadingsForStable();
     void numReadingsForStable(uint8_t readings);
 
+    uint32_t noVisitAlertTime();
+    void noVisitAlertTime(uint32_t secs);
+
 private:
     ScaleConfig();
     void save();
@@ -32,6 +35,7 @@ private:
         int32_t calibration_factor;
         char aio_key[AIO_KEY_LEN + 1];
         uint8_t num_readings_for_stable;
+        uint32_t no_visit_alert_time;
     };
 
     ScaleCfg mScaleCfg;

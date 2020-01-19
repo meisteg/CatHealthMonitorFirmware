@@ -51,6 +51,10 @@
 // of litter added matches a cat's weight.
 #define MAX_CAT_PRESENT_TIME_MS     600000
 
+// Time (in seconds) allowed between cat visits before alert is sent.
+// Alert is disabled if value is 0.
+#define NO_VISIT_ALERT_TIME_INIT    0
+
 // Pin to pull up when debug mode is desired
 #define PIN_DEBUG_MODE              D5
 

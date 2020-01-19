@@ -57,9 +57,9 @@ public:
     // Returns false if no cat selected.
     bool setCatWeight(float weight);
 
-    // Sets the duration (in milliseconds) of the selected cat's last visit.
+    // Sets the duration (in seconds) of the selected cat's last visit.
     // Returns false if no cat selected.
-    bool setCatLastDuration(uint32_t duration);
+    bool setCatLastDuration(uint16_t duration);
 
     // Sets the amount of deposit for the selected cat's last visit.
     // Returns false if no cat selected.
@@ -67,6 +67,10 @@ public:
 
     // Publish event for selected cat's visit
     bool publishCatVisit();
+
+    // Checks the last visits of the cats in the database. Send an alert if the
+    // last visit occured too long ago. Only functional on the master device.
+    void checkLastCatVisits();
 
 private:
     // Constructor
@@ -80,7 +84,8 @@ private:
         char name[MAX_CAT_NAME_LEN];
         float weight;
         time_t last_visit;
-        uint32_t last_duration;
+        uint16_t flags;
+        uint16_t last_duration;
         float last_deposit;
     };
 

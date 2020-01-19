@@ -9,6 +9,9 @@
 #include "Constants.h"
 #include "ScaleConfig.h"
 
+// Flag to indicate that the no visit alert has already been sent
+#define CAT_FLAG_NO_VISIT_ALERT_SENT   0x0001
+
 CatManager* CatManager::get()
 {
     static CatManager catManager;
@@ -36,7 +39,22 @@ void CatManager::readCatDatabase()
         Serial.println("CatManager: EEPROM was empty or invalid");
         mCatDataBase.magic = CAT_MAGIC_NUMBER;
         mCatDataBase.num_cats = 0;
-        mCatDataBase.version = 0;
+        mCatDataBase.version = 1;
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+    }
+
+    // Check if the database needs to be upgraded to a new version schema
+    if (mCatDataBase.version < 1)
+    {
+        Serial.println("Updating cat database to version 1");
+
+        // Version 1 introduced the flags attribute to each cat. Need to set to known value.
+        for (int i = 0; i < mCatDataBase.num_cats; ++i)
+        {
+            mCatDataBase.cats[i].flags = 0;
+        }
+
+        mCatDataBase.version = 1;
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
     }
 }
@@ -163,7 +181,7 @@ bool CatManager::selectCatByWeight(float weight)
             if (mSelectedCat >= 0)
             {
                 Serial.println("ERROR: Multiple cats too close in weight");
-                Particle.publish("cat_error", "{\"msg\": \"Multiple cats too close in weight!\"}", PRIVATE);
+                Particle.publish("cat_alert", "{\"msg\": \"Multiple cats too close in weight!\"}", PRIVATE);
                 mSelectedCat = -1;
                 break;
             }
@@ -223,7 +241,7 @@ bool CatManager::setCatWeight(float weight)
     return false;
 }
 
-bool CatManager::setCatLastDuration(uint32_t duration)
+bool CatManager::setCatLastDuration(uint16_t duration)
 {
     if (mSelectedCat >= 0)
     {
@@ -259,27 +277,29 @@ bool CatManager::publishCatVisit()
 
     if (mSelectedCat >= 0)
     {
-        // Save any updates to cat database
-        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
-
         entry = &(mCatDataBase.cats[mSelectedCat]);
 
-        int duration_sec = ((entry->last_duration + 500) / 1000);
-        if (duration_sec > 60)
+        // Clear no visit alert flag
+        entry->flags &= CAT_FLAG_NO_VISIT_ALERT_SENT;
+
+        // Save updates to cat database
+        EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
+        if (entry->last_duration > 60)
         {
-            int mins = (duration_sec / 60);
-            int secs = (duration_sec % 60);
+            int mins = (entry->last_duration / 60);
+            int secs = (entry->last_duration % 60);
             snprintf(publish, sizeof(publish),
-                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %d, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
                      entry->name, entry->weight, entry->last_duration, mins,
                      (mins > 1) ? "s" : "", secs, (secs == 1) ? "" : "s", entry->last_deposit);
         }
         else
         {
             snprintf(publish, sizeof(publish),
-                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %lu, \"duration_str\": \"%d seconds\", \"deposit\": %.1f}",
+                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %d, \"duration_str\": \"%d seconds\", \"deposit\": %.1f}",
                      entry->name, entry->weight, entry->last_duration,
-                     duration_sec, entry->last_deposit);
+                     entry->last_duration, entry->last_deposit);
         }
 
         Serial.printlnf("Publishing: %s", publish);
@@ -321,4 +341,34 @@ bool CatManager::publishCatVisit()
     }
 
     return ret;
+}
+
+void CatManager::checkLastCatVisits()
+{
+#if IS_MASTER_DEVICE
+    uint32_t alertTime = ScaleConfig::get()->noVisitAlertTime();
+    CatDataBaseEntry* entry;
+
+    if (alertTime > 0)
+    {
+        time_t now = Time.now();
+
+        for (int i = 0; i < mCatDataBase.num_cats; ++i)
+        {
+            entry = &(mCatDataBase.cats[i]);
+
+            if (((uint32_t)(now - entry->last_visit) > alertTime) &&
+                !(entry->flags & CAT_FLAG_NO_VISIT_ALERT_SENT))
+            {
+                entry->flags |= CAT_FLAG_NO_VISIT_ALERT_SENT;
+                EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
+                char publish[128];
+                snprintf(publish, sizeof(publish), "{\"msg\": \"%s has not visited for over %lu hours.\"}",
+                         entry->name, alertTime / 60);
+                Particle.publish("cat_alert", publish, PRIVATE);
+            }
+        }
+    }
+#endif
 }

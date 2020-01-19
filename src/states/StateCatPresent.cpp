@@ -24,8 +24,8 @@ void StateCatPresent::processReading(CatScale *scale)
         if (mNumReadingsLessThanThreshold >= ScaleConfig::get()->numReadingsForStable())
         {
             // Cat is no longer present
-            system_tick_t duration = millis() - mTimeEnter;
-            Serial.printlnf("Duration: %u", duration);
+            uint16_t duration = ((millis() - mTimeEnter) + 500) / 1000;
+            Serial.printlnf("Duration: %u seconds", duration);
             CatManager::get()->setCatLastDuration(duration);
 
             StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);

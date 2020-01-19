@@ -90,3 +90,8 @@ void StateEmpty::enter()
     // Enable OTA updates while empty
     System.enableUpdates();
 }
+
+void StateEmpty::loop()
+{
+    CatManager::get()->checkLastCatVisits();
+}
