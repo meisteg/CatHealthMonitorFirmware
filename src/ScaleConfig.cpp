@@ -28,6 +28,7 @@ ScaleConfig::ScaleConfig()
 #if USE_ADAFRUIT_IO
         Serial.printlnf("AIO Key: %s", aioKey());
 #endif
+        Serial.printlnf("Calibration factor: %d", calibrationFactor());
         Serial.printlnf("Number of readings to be stable: %u", numReadingsForStable());
     }
 }
