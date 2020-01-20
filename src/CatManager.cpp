@@ -280,7 +280,7 @@ bool CatManager::publishCatVisit()
         entry = &(mCatDataBase.cats[mSelectedCat]);
 
         // Clear no visit alert flag
-        entry->flags &= CAT_FLAG_NO_VISIT_ALERT_SENT;
+        entry->flags &= ~(CAT_FLAG_NO_VISIT_ALERT_SENT);
 
         // Save updates to cat database
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
