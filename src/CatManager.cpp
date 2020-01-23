@@ -365,7 +365,7 @@ void CatManager::checkLastCatVisits()
 
                 char publish[128];
                 snprintf(publish, sizeof(publish), "{\"msg\": \"%s has not visited for over %lu hours.\"}",
-                         entry->name, alertTime / 60);
+                         entry->name, alertTime / 3600);
                 Particle.publish("cat_alert", publish, PRIVATE);
             }
         }
