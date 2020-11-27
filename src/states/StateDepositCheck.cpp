@@ -17,13 +17,14 @@ String StateDepositCheck::getName()
 
 void StateDepositCheck::processReading(CatScale *scale)
 {
-    float reading = scale->getGrams(true);
+    float pounds = scale->getPounds(true);
+    float grams = scale->getGrams(true);
 
-    if (fabs(reading - mPrevReading) > 2.0f)
+    if ((fabs(grams - mPrevReading) > 2.0f) || (pounds >= MIN_CAT_WEIGHT_LBS))
     {
-        // Reading hasn't settled down
+        // Reading hasn't settled down or cat has returned
         mNumSameReadings = 0;
-        mPrevReading = reading;
+        mPrevReading = grams;
     }
     else
     {
@@ -32,8 +33,8 @@ void StateDepositCheck::processReading(CatScale *scale)
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Deposit determined
-            Serial.printlnf("Deposit: %.0f", reading);
-            CatManager::get()->setCatLastDeposit(reading);
+            Serial.printlnf("Deposit: %.0f", grams);
+            CatManager::get()->setCatLastDeposit(grams);
 
             StateManager::get()->setState(StateManager::STATE_TARE);
         }
