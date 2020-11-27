@@ -131,11 +131,10 @@ bool CatManager::completeTraining(float weight)
     return ret;
 }
 
-bool CatManager::publishCatDatabase(publish_network network) const
+bool CatManager::publishCatDatabase() const
 {
     char publish[512];
     char entry[80];
-    bool ret = false;
 
     snprintf(publish, sizeof(publish), "{\"num_cats\":%u, \"version\":%u, \"cats\":{",
              mCatDataBase.num_cats, mCatDataBase.version);
@@ -150,24 +149,7 @@ bool CatManager::publishCatDatabase(publish_network network) const
     strncat(publish, "}}", sizeof(publish) - strlen(publish));
     Serial.println(publish);
 
-    switch (network)
-    {
-        case NETWORK_CLOUD:
-            ret = Particle.publish("cat_database", publish, PRIVATE);
-            break;
-
-        case NETWORK_LOCAL:
-            ret = (Mesh.publish("cat_database", publish) == 0);
-            break;
-
-        case NETWORK_BOTH:
-        default:
-            ret = Particle.publish("cat_database", publish, PRIVATE);
-            ret &= (Mesh.publish("cat_database", publish) == 0);
-            break;
-    }
-
-    return ret;
+    return Particle.publish("cat_database", publish, PRIVATE);
 }
 
 bool CatManager::selectCatByWeight(float weight)
@@ -311,14 +293,6 @@ bool CatManager::publishCatVisit()
         }
 #else
         ret = true;
-#endif
-
-#if HAL_PLATFORM_MESH
-        if (Mesh.publish("cat_visit", publish) != 0)
-        {
-            Serial.println("Failed to publish to Mesh network!");
-            ret = false;
-        }
 #endif
 
 #if USE_ADAFRUIT_IO

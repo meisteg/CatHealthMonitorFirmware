@@ -94,7 +94,7 @@ void setup()
 
     Serial.println("Cat Health Monitor");
     Serial.printlnf("Build date/time: %s %s", __DATE__, __TIME__);
-    CatManager::get()->publishCatDatabase(CatManager::NETWORK_CLOUD);
+    CatManager::get()->publishCatDatabase();
 
     CatScale::get()->begin();
 

@@ -14,14 +14,6 @@
 class CatManager
 {
 public:
-    // Choice of networks to publish the cat database
-    enum publish_network
-    {
-        NETWORK_LOCAL,
-        NETWORK_CLOUD,
-        NETWORK_BOTH
-    };
-
     // Get the CatManager singleton
     static CatManager* get();
 
@@ -40,7 +32,7 @@ public:
     bool completeTraining(float weight);
 
     // Publish the cat database to the specified network
-    bool publishCatDatabase(publish_network network = NETWORK_BOTH) const;
+    bool publishCatDatabase() const;
 
     // Selects a cat in the database with the specified weight (ish)
     // Returns true if cat selected, false if no cat with that weight found
