@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2020-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "CatScale.h"
@@ -65,7 +65,7 @@ bool CatScale::takeReading()
         scaleValue = mPrevScaleReading;
 
         mSmoothReading.newSample(scaleValue);
-        Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
+        SERIAL.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
         ret = true;
     }
     else
@@ -81,13 +81,13 @@ bool CatScale::takeReading()
             // the previous reading is garbage.
             if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
             {
-                Serial.printlnf("%u\tDropping bad reading: %.2f pounds", now, getPounds((float)mPrevScaleReading));
+                SERIAL.printlnf("%u\tDropping bad reading: %.2f pounds", now, getPounds((float)mPrevScaleReading));
             }
             // Previous reading should be good
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                Serial.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
+                SERIAL.printlnf("%u\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
                 ret = true;
             }
         }

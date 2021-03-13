@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "StateManager.h"
+#include "Constants.h"
 
 StateManager* StateManager::get()
 {
@@ -41,7 +42,7 @@ void StateManager::setState(int state_new)
     {
         mStates[mStateCurrent]->exit();
 
-        Serial.printlnf("state_current = %s, state_new = %s",
+        SERIAL.printlnf("state_current = %s, state_new = %s",
                         getStateString(mStateCurrent).c_str(),
                         getStateString(state_new).c_str());
 

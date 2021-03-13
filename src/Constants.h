@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef CONSTANTS_H
@@ -73,6 +73,10 @@
 
 // Magic number used to determine if the EEPROM has been programmed
 #define SCALE_CONFIG_MAGIC_NUMBER   0x5ca1ab1e
+
+// Which serial port to use for debugging
+#define SERIAL                      Serial   // USB port
+//#define SERIAL                    Serial1  // TX/RX pins
 
 // Baud rate of the debug serial port
 #define SERIAL_BAUD                 115200

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "CatScale.h"
@@ -13,7 +13,7 @@ int catTrain(String cat_name)
     if (StateManager::get()->isState(StateManager::STATE_EMPTY) &&
         CatManager::get()->setupToTrain(cat_name))
     {
-        Serial.printlnf("Train New Cat: %s", cat_name.c_str());
+        SERIAL.printlnf("Train New Cat: %s", cat_name.c_str());
         StateManager::get()->setState(StateManager::STATE_TRAIN);
 
         return 0;
@@ -24,7 +24,7 @@ int catTrain(String cat_name)
 
 int resetCats(String unused)
 {
-    Serial.println("Removing all cats from memory");
+    SERIAL.println("Removing all cats from memory");
     CatManager::get()->reset();
 
     return 0;
@@ -34,7 +34,7 @@ int scaleCalibrate(String calibration)
 {
     ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
-    Serial.printlnf("New calibration factor: %d", ScaleConfig::get()->calibrationFactor());
+    SERIAL.printlnf("New calibration factor: %d", ScaleConfig::get()->calibrationFactor());
     StateManager::get()->setState(StateManager::STATE_TARE);
 
     return 0;
@@ -45,7 +45,7 @@ int setAIOKey(String aioKey)
     if (aioKey.length() == AIO_KEY_LEN)
     {
         ScaleConfig::get()->aioKey(aioKey);
-        Serial.printlnf("New AIO Key: %s", ScaleConfig::get()->aioKey());
+        SERIAL.printlnf("New AIO Key: %s", ScaleConfig::get()->aioKey());
 
         return 0;
     }
@@ -57,7 +57,7 @@ int setReadingsForStable(String readings)
 {
     ScaleConfig::get()->numReadingsForStable(atoi(readings.c_str()));
 
-    Serial.printlnf("New number of readings to be stable: %u",
+    SERIAL.printlnf("New number of readings to be stable: %u",
                     ScaleConfig::get()->numReadingsForStable());
 
     return 0;
@@ -67,7 +67,7 @@ int setNoVisitAlert(String secs)
 {
     ScaleConfig::get()->noVisitAlertTime(atoi(secs.c_str()));
 
-    Serial.printlnf("New no visit alert time: %u seconds",
+    SERIAL.printlnf("New no visit alert time: %u seconds",
                     ScaleConfig::get()->noVisitAlertTime());
 
     return 0;
@@ -75,7 +75,7 @@ int setNoVisitAlert(String secs)
 
 void setup()
 {
-    Serial.begin(SERIAL_BAUD);
+    SERIAL.begin(SERIAL_BAUD);
 
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
@@ -89,11 +89,8 @@ void setup()
     pinMode(PIN_LED, OUTPUT);
     pinMode(PIN_DEBUG_MODE, INPUT_PULLDOWN);
 
-    // Wait for a USB serial connection for up to 10 seconds
-    // waitFor(Serial.isConnected, 10000);
-
-    Serial.println("Cat Health Monitor");
-    Serial.printlnf("Build date/time: %s %s", __DATE__, __TIME__);
+    SERIAL.println("Cat Health Monitor");
+    SERIAL.printlnf("Build date/time: %s %s", __DATE__, __TIME__);
     CatManager::get()->publishCatDatabase();
 
     CatScale::get()->begin();

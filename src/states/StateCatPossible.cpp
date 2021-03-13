@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -68,7 +68,7 @@ void StateCatPossible::stableReading(float reading)
         // Scale drift, cat deposits or litter box cleaning
         else
         {
-            Serial.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
+            SERIAL.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
             StateManager::get()->setState(StateManager::STATE_TARE);
         }
     }

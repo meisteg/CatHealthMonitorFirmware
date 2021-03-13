@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -39,7 +39,7 @@ void StateEmpty::processReading(CatScale *scale)
                 if (mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable())
                 {
                     // Scale drift, cat deposits or litter box cleaning
-                    Serial.printlnf("Automatic tare due to non-zero grams: %.0f", grams);
+                    SERIAL.printlnf("Automatic tare due to non-zero grams: %.0f", grams);
                     StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }
@@ -71,7 +71,7 @@ void StateEmpty::processReading(CatScale *scale)
                 // Scale drift, cat deposits or litter box cleaning
                 else
                 {
-                    Serial.printlnf("Automatic tare due to non-zero pounds: %.1f", pounds);
+                    SERIAL.printlnf("Automatic tare due to non-zero pounds: %.1f", pounds);
                     StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }

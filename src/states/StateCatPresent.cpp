@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "StateCatPresent.h"
@@ -25,7 +25,7 @@ void StateCatPresent::processReading(CatScale *scale)
         {
             // Cat is no longer present
             uint16_t duration = ((millis() - mTimeEnter) + 500) / 1000;
-            Serial.printlnf("Duration: %u seconds", duration);
+            SERIAL.printlnf("Duration: %u seconds", duration);
             CatManager::get()->setCatLastDuration(duration);
 
             StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);

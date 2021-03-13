@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -49,7 +49,7 @@ void StateTrain::processReading(CatScale *scale)
             // Save weight into Cat Database
             if (!CatManager::get()->completeTraining(reading))
             {
-                Serial.println("ERROR: Failed to complete training");
+                SERIAL.println("ERROR: Failed to complete training");
                 Particle.publish("cat_alert", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
             }
 

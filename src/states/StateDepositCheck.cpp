@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
@@ -33,7 +33,7 @@ void StateDepositCheck::processReading(CatScale *scale)
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Deposit determined
-            Serial.printlnf("Deposit: %.0f", grams);
+            SERIAL.printlnf("Deposit: %.0f", grams);
             CatManager::get()->setCatLastDeposit(grams);
 
             StateManager::get()->setState(StateManager::STATE_TARE);

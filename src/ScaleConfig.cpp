@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include "ScaleConfig.h"
@@ -16,7 +16,7 @@ ScaleConfig::ScaleConfig()
     EEPROM.get(SCALE_CONFIG_ADDR, mScaleCfg);
     if (mScaleCfg.magic != SCALE_CONFIG_MAGIC_NUMBER)
     {
-        Serial.println("ScaleConfig: EEPROM was empty or invalid");
+        SERIAL.println("ScaleConfig: EEPROM was empty or invalid");
         mScaleCfg.magic = SCALE_CONFIG_MAGIC_NUMBER;
         mScaleCfg.calibration_factor = CALIBRATION_FACTOR_INIT;
         // mScaleCfg.aio_key intentionally not set
@@ -27,11 +27,11 @@ ScaleConfig::ScaleConfig()
     else
     {
 #if USE_ADAFRUIT_IO
-        Serial.printlnf("AIO Key: %s", aioKey());
+        SERIAL.printlnf("AIO Key: %s", aioKey());
 #endif
-        Serial.printlnf("Calibration factor: %d", calibrationFactor());
-        Serial.printlnf("Number of readings to be stable: %u", numReadingsForStable());
-        Serial.printlnf("No visit alert time (0 to disable): %u seconds", noVisitAlertTime());
+        SERIAL.printlnf("Calibration factor: %d", calibrationFactor());
+        SERIAL.printlnf("Number of readings to be stable: %u", numReadingsForStable());
+        SERIAL.printlnf("No visit alert time (0 to disable): %u seconds", noVisitAlertTime());
     }
 }
 

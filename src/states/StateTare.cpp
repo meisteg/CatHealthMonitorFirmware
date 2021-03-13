@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #include <math.h>
 
 #include "StateTare.h"
 #include "StateManager.h"
+#include "Constants.h"
 
 String StateTare::getName()
 {
@@ -21,7 +22,7 @@ bool StateTare::takeReading(CatScale *scale)
         // Just tared the scale, so initial reading should be close to zero
         if (fabs(scale->getGrams(false)) > 1.0f)
         {
-            Serial.println("Non-zero reading: Tare the scale again");
+            SERIAL.println("Non-zero reading: Tare the scale again");
             scale->tare();
             ret = false;
         }
