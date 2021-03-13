@@ -26,8 +26,8 @@
 // Number of Grams in a Pound
 #define GRAMS_IN_POUND              453.592f
 
-// Flag to indicate if the compiled target is the gateway mesh device
-#define IS_MASTER_DEVICE            (PLATFORM_ID != PLATFORM_XENON)
+// Flag to indicate if the compiled target is the gateway device
+#define IS_MASTER_DEVICE            (1)
 
 // Minimum weight of a cat before it will register
 // Must be greater than CAT_NOT_PRESENT_THRESHOLD
@@ -91,6 +91,6 @@
 #define TRAINING_LED_TOGGLE_MS      500
 
 // Flag to indicate if the compiled target supports using Adafruit IO
-#define USE_ADAFRUIT_IO             (PLATFORM_ID != PLATFORM_XENON)
+#define USE_ADAFRUIT_IO             (1)
 
 #endif

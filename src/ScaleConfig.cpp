@@ -29,9 +29,9 @@ ScaleConfig::ScaleConfig()
 #if USE_ADAFRUIT_IO
         SERIAL.printlnf("AIO Key: %s", aioKey());
 #endif
-        SERIAL.printlnf("Calibration factor: %d", calibrationFactor());
+        SERIAL.printlnf("Calibration factor: %ld", calibrationFactor());
         SERIAL.printlnf("Number of readings to be stable: %u", numReadingsForStable());
-        SERIAL.printlnf("No visit alert time (0 to disable): %u seconds", noVisitAlertTime());
+        SERIAL.printlnf("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
     }
 }
 

@@ -34,7 +34,7 @@ int scaleCalibrate(String calibration)
 {
     ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
-    SERIAL.printlnf("New calibration factor: %d", ScaleConfig::get()->calibrationFactor());
+    SERIAL.printlnf("New calibration factor: %ld", ScaleConfig::get()->calibrationFactor());
     StateManager::get()->setState(StateManager::STATE_TARE);
 
     return 0;
@@ -67,7 +67,7 @@ int setNoVisitAlert(String secs)
 {
     ScaleConfig::get()->noVisitAlertTime(atoi(secs.c_str()));
 
-    SERIAL.printlnf("New no visit alert time: %u seconds",
+    SERIAL.printlnf("New no visit alert time: %lu seconds",
                     ScaleConfig::get()->noVisitAlertTime());
 
     return 0;
