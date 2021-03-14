@@ -63,9 +63,10 @@ bool CatScale::takeReading()
     if (mDebugMode)
     {
         scaleValue = mPrevScaleReading;
-
         mSmoothReading.newSample(scaleValue);
-        Log.trace("Pounds: %.2f\tGrams: %.0f", getPounds(false), getGrams(false));
+
+        Log.trace("Pounds: %.2f\tGrams: %.0f\tVoltage=%.2f\tUSB=%d\tCharging=%d",
+                  getPounds(false), getGrams(false), getVoltage(), isUsbPowered(), isCharging());
         ret = true;
     }
     else
@@ -87,7 +88,8 @@ bool CatScale::takeReading()
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                Log.trace("Pounds: %.2f\tGrams: %.0f", getPounds(false), getGrams(false));
+                Log.trace("Pounds: %.2f\tGrams: %.0f\tVoltage=%.2f\tUSB=%d\tCharging=%d",
+                          getPounds(false), getGrams(false), getVoltage(), isUsbPowered(), isCharging());
                 ret = true;
             }
         }
@@ -144,4 +146,21 @@ float CatScale::getGrams(float value)
 {
     float calFactor = (float)ScaleConfig::get()->calibrationFactor() / GRAMS_IN_POUND;
     return (value / calFactor);
+}
+
+float CatScale::getVoltage() const
+{
+    return analogRead(BATT) * 0.0011224;
+}
+
+bool CatScale::isUsbPowered() const
+{
+    // PWR: 0=no USB power, 1=USB powered
+    return digitalRead(PWR);
+}
+
+bool CatScale::isCharging() const
+{
+    // CHG: 0=charging, 1=not charging
+    return (isUsbPowered() && !digitalRead(CHG));
 }

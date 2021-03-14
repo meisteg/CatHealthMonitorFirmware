@@ -96,6 +96,8 @@ void setup()
 
     pinMode(PIN_LED, OUTPUT);
     pinMode(PIN_DEBUG_MODE, INPUT_PULLDOWN);
+    pinMode(PWR, INPUT);
+    pinMode(CHG, INPUT);
 
     Log.info("Cat Health Monitor");
     Log.info("Build date/time: %s %s", __DATE__, __TIME__);

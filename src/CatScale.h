@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2020-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef CAT_SCALE_H
@@ -35,6 +35,15 @@ public:
 
     // Get the current reading value in grams
     float getGrams(bool round);
+
+    // Get the current voltage of the scale's battery
+    float getVoltage() const;
+
+    // Returns true to indicate that the scale is powered by USB
+    bool isUsbPowered() const;
+
+    // Returned true to indicate that the scale is scale is charging
+    bool isCharging() const;
 
 private:
     // Constructor
