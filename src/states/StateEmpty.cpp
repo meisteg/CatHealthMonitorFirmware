@@ -10,6 +10,11 @@
 #include "CatManager.h"
 #include "ScaleConfig.h"
 
+StateEmpty::StateEmpty() : mSentBatteryWarning(false), mWasBatteryCharging(false)
+{
+    // Nothing to do
+}
+
 String StateEmpty::getName()
 {
     return "EMPTY";
@@ -94,4 +99,39 @@ void StateEmpty::enter()
 void StateEmpty::loop()
 {
     CatManager::get()->checkLastCatVisits();
+    checkBatteryState();
+}
+
+void StateEmpty::checkBatteryState()
+{
+    char publish[128];
+
+    CatScale *scale = CatScale::get();
+    if (scale->isUsbPowered())
+    {
+        // Reset battery warning flag
+        mSentBatteryWarning = false;
+
+        bool isCharging = scale->isCharging();
+        if (mWasBatteryCharging && !isCharging)
+        {
+            snprintf(publish, sizeof(publish),
+                     "{\"msg\": \"Battery charging is complete! You may now unplug.\"}");
+            Particle.publish("cat_alert", publish, PRIVATE);
+        }
+
+        mWasBatteryCharging = isCharging;
+    }
+    else
+    {
+        if ((scale->getBatteryPercent() < BATTERY_WARN_PERCENT) && !mSentBatteryWarning)
+        {
+            snprintf(publish, sizeof(publish),
+                     "{\"msg\": \"Battery less than %.1f percent. Please plug in to charge.\"}",
+                     BATTERY_WARN_PERCENT);
+            mSentBatteryWarning = Particle.publish("cat_alert", publish, PRIVATE);
+        }
+
+        mWasBatteryCharging = false;
+    }
 }

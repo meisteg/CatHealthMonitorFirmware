@@ -29,6 +29,9 @@ void CatScale::begin()
     mScale.begin();
     tare();
 
+    Particle.variable("batt_volt", [this](){ return this->getVoltage(); });
+    Particle.variable("batt_percent", [this](){ return this->getBatteryPercent(); });
+
     if (mDebugMode)
     {
         Particle.function("set_scale_reading", setScaleReading);
@@ -65,8 +68,8 @@ bool CatScale::takeReading()
         scaleValue = mPrevScaleReading;
         mSmoothReading.newSample(scaleValue);
 
-        Log.trace("Pounds: %.2f\tGrams: %.0f\tVoltage=%.2f\tUSB=%d\tCharging=%d",
-                  getPounds(false), getGrams(false), getVoltage(), isUsbPowered(), isCharging());
+        Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%.0f)\tUSB: %d  Charging: %d",
+                  getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
         ret = true;
     }
     else
@@ -88,8 +91,8 @@ bool CatScale::takeReading()
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                Log.trace("Pounds: %.2f\tGrams: %.0f\tVoltage=%.2f\tUSB=%d\tCharging=%d",
-                          getPounds(false), getGrams(false), getVoltage(), isUsbPowered(), isCharging());
+                Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%.0f)\tUSB: %d  Charging: %d",
+                          getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
                 ret = true;
             }
         }
@@ -163,4 +166,14 @@ bool CatScale::isCharging() const
 {
     // CHG: 0=charging, 1=not charging
     return (isUsbPowered() && !digitalRead(CHG));
+}
+
+float CatScale::getBatteryPercent() const
+{
+    float percent = ((getVoltage() - BATTERY_MIN_VOLT) / (BATTERY_MAX_VOLT - BATTERY_MIN_VOLT)) * 100;
+
+    if (percent > 100.0f) return 100.0f;
+    if (percent < 0.0f) return 0.0f;
+
+    return percent;
 }

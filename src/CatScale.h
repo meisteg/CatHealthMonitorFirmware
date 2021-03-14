@@ -45,6 +45,9 @@ public:
     // Returned true to indicate that the scale is scale is charging
     bool isCharging() const;
 
+    // Get the current calculated percentage of the scale's battery
+    float getBatteryPercent() const;
+
 private:
     // Constructor
     CatScale();

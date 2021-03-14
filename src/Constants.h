@@ -8,6 +8,15 @@
 // Adafruit IO API Key length
 #define AIO_KEY_LEN                 32
 
+// Maximum voltage of the battery
+#define BATTERY_MAX_VOLT            4.1f
+
+// Minimum voltage of the battery
+#define BATTERY_MIN_VOLT            3.6f
+
+// Battery percentage to warn the user of low battery
+#define BATTERY_WARN_PERCENT        25.0f
+
 // Initial calibration of the scale
 #define CALIBRATION_FACTOR_INIT    -10850
 
