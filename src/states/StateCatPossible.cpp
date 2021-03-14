@@ -68,7 +68,7 @@ void StateCatPossible::stableReading(float reading)
         // Scale drift, cat deposits or litter box cleaning
         else
         {
-            SERIAL.printlnf("Automatic tare due to non-zero reading: %.1f", reading);
+            Log.info("Automatic tare due to non-zero reading: %.1f", reading);
             StateManager::get()->setState(StateManager::STATE_TARE);
         }
     }

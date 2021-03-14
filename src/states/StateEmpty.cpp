@@ -39,7 +39,7 @@ void StateEmpty::processReading(CatScale *scale)
                 if (mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable())
                 {
                     // Scale drift, cat deposits or litter box cleaning
-                    SERIAL.printlnf("Automatic tare due to non-zero grams: %.0f", grams);
+                    Log.info("Automatic tare due to non-zero grams: %.0f", grams);
                     StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }
@@ -71,7 +71,7 @@ void StateEmpty::processReading(CatScale *scale)
                 // Scale drift, cat deposits or litter box cleaning
                 else
                 {
-                    SERIAL.printlnf("Automatic tare due to non-zero pounds: %.1f", pounds);
+                    Log.info("Automatic tare due to non-zero pounds: %.1f", pounds);
                     StateManager::get()->setState(StateManager::STATE_TARE);
                 }
             }

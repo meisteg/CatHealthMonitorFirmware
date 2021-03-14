@@ -8,12 +8,22 @@
 #include "CatManager.h"
 #include "ScaleConfig.h"
 
+// USB Serial configuration
+SerialLogHandler logHandler(LOG_LEVEL_WARN, { // Logging level for non-application messages
+    {"app", LOG_LEVEL_TRACE}                  // Logging level for all application messages
+});
+
+// Serial over TX/RX configuration
+Serial1LogHandler log1Handler(SERIAL_BAUD, LOG_LEVEL_WARN, { // Logging level for non-application messages
+    {"app", LOG_LEVEL_TRACE}                                 // Logging level for all application messages
+});
+
 int catTrain(String cat_name)
 {
     if (StateManager::get()->isState(StateManager::STATE_EMPTY) &&
         CatManager::get()->setupToTrain(cat_name))
     {
-        SERIAL.printlnf("Train New Cat: %s", cat_name.c_str());
+        Log.info("Train New Cat: %s", cat_name.c_str());
         StateManager::get()->setState(StateManager::STATE_TRAIN);
 
         return 0;
@@ -24,7 +34,7 @@ int catTrain(String cat_name)
 
 int resetCats(String unused)
 {
-    SERIAL.println("Removing all cats from memory");
+    Log.warn("Removing all cats from memory");
     CatManager::get()->reset();
 
     return 0;
@@ -34,7 +44,7 @@ int scaleCalibrate(String calibration)
 {
     ScaleConfig::get()->calibrationFactor(atoi(calibration.c_str()));
 
-    SERIAL.printlnf("New calibration factor: %ld", ScaleConfig::get()->calibrationFactor());
+    Log.info("New calibration factor: %ld", ScaleConfig::get()->calibrationFactor());
     StateManager::get()->setState(StateManager::STATE_TARE);
 
     return 0;
@@ -45,7 +55,7 @@ int setAIOKey(String aioKey)
     if (aioKey.length() == AIO_KEY_LEN)
     {
         ScaleConfig::get()->aioKey(aioKey);
-        SERIAL.printlnf("New AIO Key: %s", ScaleConfig::get()->aioKey());
+        Log.info("New AIO Key: %s", ScaleConfig::get()->aioKey());
 
         return 0;
     }
@@ -57,8 +67,8 @@ int setReadingsForStable(String readings)
 {
     ScaleConfig::get()->numReadingsForStable(atoi(readings.c_str()));
 
-    SERIAL.printlnf("New number of readings to be stable: %u",
-                    ScaleConfig::get()->numReadingsForStable());
+    Log.info("New number of readings to be stable: %u",
+             ScaleConfig::get()->numReadingsForStable());
 
     return 0;
 }
@@ -67,16 +77,14 @@ int setNoVisitAlert(String secs)
 {
     ScaleConfig::get()->noVisitAlertTime(atoi(secs.c_str()));
 
-    SERIAL.printlnf("New no visit alert time: %lu seconds",
-                    ScaleConfig::get()->noVisitAlertTime());
+    Log.info("New no visit alert time: %lu seconds",
+             ScaleConfig::get()->noVisitAlertTime());
 
     return 0;
 }
 
 void setup()
 {
-    SERIAL.begin(SERIAL_BAUD);
-
     Particle.function("train", catTrain);
     Particle.function("reset", resetCats);
     Particle.function("calibration", scaleCalibrate);
@@ -89,8 +97,8 @@ void setup()
     pinMode(PIN_LED, OUTPUT);
     pinMode(PIN_DEBUG_MODE, INPUT_PULLDOWN);
 
-    SERIAL.println("Cat Health Monitor");
-    SERIAL.printlnf("Build date/time: %s %s", __DATE__, __TIME__);
+    Log.info("Cat Health Monitor");
+    Log.info("Build date/time: %s %s", __DATE__, __TIME__);
     CatManager::get()->publishCatDatabase();
 
     CatScale::get()->begin();

@@ -49,7 +49,7 @@ void StateTrain::processReading(CatScale *scale)
             // Save weight into Cat Database
             if (!CatManager::get()->completeTraining(reading))
             {
-                SERIAL.println("ERROR: Failed to complete training");
+                Log.error("Failed to complete training");
                 Particle.publish("cat_alert", "{\"msg\": \"Failed to complete training!\"}", PRIVATE);
             }
 

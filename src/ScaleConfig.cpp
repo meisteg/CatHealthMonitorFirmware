@@ -16,10 +16,10 @@ ScaleConfig::ScaleConfig()
     EEPROM.get(SCALE_CONFIG_ADDR, mScaleCfg);
     if (mScaleCfg.magic != SCALE_CONFIG_MAGIC_NUMBER)
     {
-        SERIAL.println("ScaleConfig: EEPROM was empty or invalid");
+        Log.error("ScaleConfig: EEPROM was empty or invalid");
         mScaleCfg.magic = SCALE_CONFIG_MAGIC_NUMBER;
         mScaleCfg.calibration_factor = CALIBRATION_FACTOR_INIT;
-        // mScaleCfg.aio_key intentionally not set
+        mScaleCfg.aio_key[0] = 0;
         mScaleCfg.num_readings_for_stable = READINGS_TO_BE_STABLE_INIT;
         mScaleCfg.no_visit_alert_time = NO_VISIT_ALERT_TIME_INIT;
         save();
@@ -27,11 +27,11 @@ ScaleConfig::ScaleConfig()
     else
     {
 #if USE_ADAFRUIT_IO
-        SERIAL.printlnf("AIO Key: %s", aioKey());
+        Log.info("AIO Key: %s", aioKey());
 #endif
-        SERIAL.printlnf("Calibration factor: %ld", calibrationFactor());
-        SERIAL.printlnf("Number of readings to be stable: %u", numReadingsForStable());
-        SERIAL.printlnf("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
+        Log.info("Calibration factor: %ld", calibrationFactor());
+        Log.info("Number of readings to be stable: %u", numReadingsForStable());
+        Log.info("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
     }
 }
 

@@ -33,7 +33,7 @@ void StateDepositCheck::processReading(CatScale *scale)
         if (mNumSameReadings >= ScaleConfig::get()->numReadingsForStable())
         {
             // Deposit determined
-            SERIAL.printlnf("Deposit: %.0f", grams);
+            Log.info("Deposit: %.0f", grams);
             CatManager::get()->setCatLastDeposit(grams);
 
             StateManager::get()->setState(StateManager::STATE_TARE);

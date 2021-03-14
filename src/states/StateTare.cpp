@@ -22,7 +22,7 @@ bool StateTare::takeReading(CatScale *scale)
         // Just tared the scale, so initial reading should be close to zero
         if (fabs(scale->getGrams(false)) > 1.0f)
         {
-            SERIAL.println("Non-zero reading: Tare the scale again");
+            Log.warn("Non-zero reading: Tare the scale again");
             scale->tare();
             ret = false;
         }

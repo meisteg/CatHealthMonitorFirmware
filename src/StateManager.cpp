@@ -42,9 +42,9 @@ void StateManager::setState(int state_new)
     {
         mStates[mStateCurrent]->exit();
 
-        SERIAL.printlnf("state_current = %s, state_new = %s",
-                        getStateString(mStateCurrent).c_str(),
-                        getStateString(state_new).c_str());
+        Log.info("state_current = %s, state_new = %s",
+                 getStateString(mStateCurrent).c_str(),
+                 getStateString(state_new).c_str());
 
         Particle.publish("state_change", getStateString(state_new).c_str(), PRIVATE);
 

@@ -65,7 +65,7 @@ bool CatScale::takeReading()
         scaleValue = mPrevScaleReading;
 
         mSmoothReading.newSample(scaleValue);
-        SERIAL.printlnf("%lu\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
+        Log.trace("Pounds: %.2f\tGrams: %.0f", getPounds(false), getGrams(false));
         ret = true;
     }
     else
@@ -81,13 +81,13 @@ bool CatScale::takeReading()
             // the previous reading is garbage.
             if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
             {
-                SERIAL.printlnf("%lu\tDropping bad reading: %.2f pounds", now, getPounds((float)mPrevScaleReading));
+                Log.warn("Dropping bad reading: %.2f pounds", getPounds((float)mPrevScaleReading));
             }
             // Previous reading should be good
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                SERIAL.printlnf("%lu\tPounds: %.2f\tGrams: %.0f", now, getPounds(false), getGrams(false));
+                Log.trace("Pounds: %.2f\tGrams: %.0f", getPounds(false), getGrams(false));
                 ret = true;
             }
         }

@@ -36,7 +36,7 @@ void CatManager::readCatDatabase()
     EEPROM.get(CAT_DATABASE_ADDR, mCatDataBase);
     if ((mCatDataBase.magic != CAT_MAGIC_NUMBER) || (mCatDataBase.num_cats > MAX_NUM_CATS))
     {
-        SERIAL.println("CatManager: EEPROM was empty or invalid");
+        Log.error("CatManager: EEPROM was empty or invalid");
         mCatDataBase.magic = CAT_MAGIC_NUMBER;
         mCatDataBase.num_cats = 0;
         mCatDataBase.version = 1;
@@ -46,7 +46,7 @@ void CatManager::readCatDatabase()
     // Check if the database needs to be upgraded to a new version schema
     if (mCatDataBase.version < 1)
     {
-        SERIAL.println("Updating cat database to version 1");
+        Log.info("Updating cat database to version 1");
 
         // Version 1 introduced the flags attribute to each cat. Need to set to known value.
         for (int i = 0; i < mCatDataBase.num_cats; ++i)
@@ -71,7 +71,7 @@ void CatManager::reset()
     }
     else
     {
-        SERIAL.println("No cats found in database");
+        Log.info("No cats found in database");
     }
 }
 
@@ -147,7 +147,7 @@ bool CatManager::publishCatDatabase() const
     }
 
     strncat(publish, "}}", sizeof(publish) - strlen(publish));
-    SERIAL.println(publish);
+    Log.info(publish);
 
     return Particle.publish("cat_database", publish, PRIVATE);
 }
@@ -162,7 +162,7 @@ bool CatManager::selectCatByWeight(float weight)
         {
             if (mSelectedCat >= 0)
             {
-                SERIAL.println("ERROR: Multiple cats too close in weight");
+                Log.error("Multiple cats too close in weight");
                 Particle.publish("cat_alert", "{\"msg\": \"Multiple cats too close in weight!\"}", PRIVATE);
                 mSelectedCat = -1;
                 break;
@@ -174,7 +174,7 @@ bool CatManager::selectCatByWeight(float weight)
 
     if (mSelectedCat >= 0)
     {
-        SERIAL.printlnf("%s selected", mCatDataBase.cats[mSelectedCat].name);
+        Log.info("%s selected", mCatDataBase.cats[mSelectedCat].name);
         setCatWeight(weight);
 
         return true;
@@ -213,7 +213,7 @@ bool CatManager::setCatWeight(float weight)
     {
         if (mCatDataBase.cats[mSelectedCat].weight != weight)
         {
-            SERIAL.printlnf("Updating weight to %.2f lbs", weight);
+            Log.info("Updating weight to %.2f lbs", weight);
             mCatDataBase.cats[mSelectedCat].weight = weight;
         }
 
@@ -284,12 +284,12 @@ bool CatManager::publishCatVisit()
                      entry->last_duration, entry->last_deposit);
         }
 
-        SERIAL.printlnf("Publishing: %s", publish);
+        Log.info("Publishing: %s", publish);
 #if IS_MASTER_DEVICE
         ret = Particle.publish("cat_visit", publish, PRIVATE);
         if (!ret)
         {
-            SERIAL.println("Failed to publish to Particle!");
+            Log.error("Failed to publish to Particle!");
         }
 #else
         ret = true;
@@ -306,7 +306,7 @@ bool CatManager::publishCatVisit()
         // Send to Adafruit IO
         if (!aioFeed.send(publish))
         {
-            SERIAL.println("Failed to publish to Adafruit IO!");
+            Log.error("Failed to publish to Adafruit IO!");
             ret = false;
         }
 #endif

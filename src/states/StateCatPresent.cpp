@@ -25,7 +25,7 @@ void StateCatPresent::processReading(CatScale *scale)
         {
             // Cat is no longer present
             uint16_t duration = ((millis() - mTimeEnter) + 500) / 1000;
-            SERIAL.printlnf("Duration: %u seconds", duration);
+            Log.info("Duration: %u seconds", duration);
             CatManager::get()->setCatLastDuration(duration);
 
             StateManager::get()->setState(StateManager::STATE_DEPOSIT_CHECK);
