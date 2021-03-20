@@ -8,6 +8,9 @@
 // Adafruit IO API Key length
 #define AIO_KEY_LEN                 32
 
+// Time constant used to exponentially smooth battery percentage readings
+#define BATT_PERCENT_TIME_CONSTANT  5.0f
+
 // Maximum voltage of the battery
 #define BATTERY_MAX_VOLT            4.1f
 
@@ -15,7 +18,7 @@
 #define BATTERY_MIN_VOLT            3.6f
 
 // Battery percentage to warn the user of low battery
-#define BATTERY_WARN_PERCENT        25.0f
+#define BATTERY_WARN_PERCENT        20
 
 // Initial calibration of the scale
 #define CALIBRATION_FACTOR_INIT    -10850
@@ -86,7 +89,7 @@
 // Baud rate of the debug serial port
 #define SERIAL_BAUD                 115200
 
-// Time constant to use to exponentially smooth the scale readings
+// Time constant used to exponentially smooth the weight readings
 #define SMOOTH_TIME_CONSTANT        0.5f
 
 // Time will be sync'd with the cloud if last sync was at least this long ago in milliseconds

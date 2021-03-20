@@ -46,7 +46,7 @@ public:
     bool isCharging() const;
 
     // Get the current calculated percentage of the scale's battery
-    float getBatteryPercent() const;
+    unsigned int getBatteryPercent() const;
 
 private:
     // Constructor

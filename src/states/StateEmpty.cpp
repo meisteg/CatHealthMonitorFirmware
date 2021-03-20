@@ -127,7 +127,7 @@ void StateEmpty::checkBatteryState()
         if ((scale->getBatteryPercent() < BATTERY_WARN_PERCENT) && !mSentBatteryWarning)
         {
             snprintf(publish, sizeof(publish),
-                     "{\"msg\": \"Battery less than %.1f percent. Please plug in to charge.\"}",
+                     "{\"msg\": \"Battery less than %u percent. Please plug in to charge.\"}",
                      BATTERY_WARN_PERCENT);
             mSentBatteryWarning = Particle.publish("cat_alert", publish, PRIVATE);
         }

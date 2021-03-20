@@ -68,7 +68,7 @@ bool CatScale::takeReading()
         scaleValue = mPrevScaleReading;
         mSmoothReading.newSample(scaleValue);
 
-        Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%.0f)\tUSB: %d  Charging: %d",
+        Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%u)\tUSB: %d  Charging: %d",
                   getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
         ret = true;
     }
@@ -91,7 +91,7 @@ bool CatScale::takeReading()
             else
             {
                 mSmoothReading.newSample(mPrevScaleReading);
-                Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%.0f)\tUSB: %d  Charging: %d",
+                Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%u)\tUSB: %d  Charging: %d",
                           getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
                 ret = true;
             }
@@ -168,12 +168,15 @@ bool CatScale::isCharging() const
     return (isUsbPowered() && !digitalRead(CHG));
 }
 
-float CatScale::getBatteryPercent() const
+unsigned int CatScale::getBatteryPercent() const
 {
+    static ExponentiallySmoothedValue smoothPercent(BATT_PERCENT_TIME_CONSTANT);
     float percent = ((getVoltage() - BATTERY_MIN_VOLT) / (BATTERY_MAX_VOLT - BATTERY_MIN_VOLT)) * 100;
 
-    if (percent > 100.0f) return 100.0f;
-    if (percent < 0.0f) return 0.0f;
+    if (percent > 100.0f) percent = 100.0f;
+    else if (percent < 0.0f) percent = 0.0f;
 
-    return percent;
+    smoothPercent.newSample(percent);
+
+    return (unsigned int)(smoothPercent.val());
 }
