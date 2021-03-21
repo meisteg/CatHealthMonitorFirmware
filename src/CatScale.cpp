@@ -178,5 +178,5 @@ unsigned int CatScale::getBatteryPercent() const
 
     smoothPercent.newSample(percent);
 
-    return (unsigned int)(smoothPercent.val());
+    return (unsigned int)(roundf(smoothPercent.val()));
 }
