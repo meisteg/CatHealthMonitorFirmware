@@ -41,7 +41,8 @@ void StateEmpty::processReading(CatScale *scale)
             else
             {
                 mNumSameNonZeroReadingsGrams++;
-                if (mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable())
+                if ((mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable()) &&
+                    networkNeeded())
                 {
                     // Scale drift, cat deposits or litter box cleaning
                     Log.info("Automatic tare due to non-zero grams: %.0f", grams);
@@ -54,7 +55,10 @@ void StateEmpty::processReading(CatScale *scale)
     {
         mNumSameNonZeroReadingsPounds++;
 
-        if (mNumSameNonZeroReadingsPounds >= ScaleConfig::get()->numReadingsForStable())
+        // Flag the network as needed first as it's likely going to be
+        // needed very soon and don't want to wait too long for it. However,
+        // it needs to be available before stable reading can be processed.
+        if (networkNeeded() && (mNumSameNonZeroReadingsPounds >= ScaleConfig::get()->numReadingsForStable()))
         {
             // Is it a cat?
             if (CatManager::get()->selectCatByWeight(pounds))
@@ -92,14 +96,18 @@ void StateEmpty::enter()
     mNumSameNonZeroReadingsGrams = 0;
     mPrevReadingGrams = 0.0f;
 
+    mTimeNetworkNeeded = millis();
+
     // Enable OTA updates while empty
     System.enableUpdates();
 }
 
 void StateEmpty::loop()
 {
-    CatManager::get()->checkLastCatVisits();
+    if (Particle.connected()) CatManager::get()->checkLastCatVisits();
+
     checkBatteryState();
+    networkUpDown();
 }
 
 void StateEmpty::checkBatteryState()
@@ -115,16 +123,23 @@ void StateEmpty::checkBatteryState()
         bool isCharging = scale->isCharging();
         if (mWasBatteryCharging && !isCharging)
         {
-            snprintf(publish, sizeof(publish),
-                     "{\"msg\": \"Battery charging is complete! You may now unplug.\"}");
-            Particle.publish("cat_alert", publish, PRIVATE);
-        }
+            if (networkNeeded())
+            {
+                snprintf(publish, sizeof(publish),
+                        "{\"msg\": \"Battery charging is complete! You may now unplug.\"}");
+                Particle.publish("cat_alert", publish, PRIVATE);
 
-        mWasBatteryCharging = isCharging;
+                mWasBatteryCharging = isCharging;
+            }
+        }
+        else
+        {
+            mWasBatteryCharging = isCharging;
+        }
     }
     else
     {
-        if ((scale->getBatteryPercent() < BATTERY_WARN_PERCENT) && !mSentBatteryWarning)
+        if ((scale->getBatteryPercent() < BATTERY_WARN_PERCENT) && !mSentBatteryWarning && networkNeeded())
         {
             snprintf(publish, sizeof(publish),
                      "{\"msg\": \"Battery less than %u percent. Please plug in to charge.\"}",
@@ -134,4 +149,53 @@ void StateEmpty::checkBatteryState()
 
         mWasBatteryCharging = false;
     }
+}
+
+void StateEmpty::networkUpDown()
+{
+#if STAY_CONNECTED_WHEN_ON_USB
+    bool isUsbPowered = CatScale::get()->isUsbPowered();
+
+    // If we are plugged in, always be connected to the network
+    if (isUsbPowered) networkNeeded();
+#endif
+
+    // Disable network after idle delay
+    if (((millis() - mTimeNetworkNeeded) > NETWORK_DISABLE_DELAY_MS)
+#if STAY_CONNECTED_WHEN_ON_USB
+        && !isUsbPowered
+#endif
+    )
+    {
+        if (Particle.connected())
+        {
+            Log.info("Disconnecting from Particle network");
+            Particle.disconnect();
+        }
+        else if (WiFi.ready())
+        {
+            Log.info("Disconnecting from WiFi");
+            WiFi.off();
+        }
+    }
+}
+
+bool StateEmpty::networkNeeded()
+{
+    static bool connecting = false;
+    mTimeNetworkNeeded = millis();
+    bool available = Particle.connected();
+
+    // There is no Particle.connecting() function that can be used to check that
+    // Particle.connect() has already been called, so use local connecting flag.
+    if (!available && !connecting)
+    {
+        Log.info("Connecting to Particle network");
+        Particle.connect();
+        connecting = true;
+    }
+
+    if (available) connecting = false;
+
+    return available;
 }

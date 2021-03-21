@@ -63,6 +63,9 @@
 // of litter added matches a cat's weight.
 #define MAX_CAT_PRESENT_TIME_MS     600000
 
+// Time to delay when idle before disabling network connection
+#define NETWORK_DISABLE_DELAY_MS    60000
+
 // Time (in seconds) allowed between cat visits before alert is sent.
 // Alert is disabled if value is 0.
 #define NO_VISIT_ALERT_TIME_INIT    0
@@ -80,6 +83,9 @@
 // Initial value for the number of readings in a row that must match before action is taken
 #define READINGS_TO_BE_STABLE_INIT  10
 
+// Used to disable the LED. Not defined by DeviceOS for some reason.
+#define RGB_COLOR_NONE              0x00000000
+
 // Address of the scale configuration in the EEPROM
 #define SCALE_CONFIG_ADDR           0x0400
 
@@ -91,6 +97,9 @@
 
 // Time constant used to exponentially smooth the weight readings
 #define SMOOTH_TIME_CONSTANT        0.5f
+
+// Flag to indicate whether the device should stay connected when USB powered
+#define STAY_CONNECTED_WHEN_ON_USB  (1)
 
 // Time will be sync'd with the cloud if last sync was at least this long ago in milliseconds
 #define TIME_SYNC_MILLIS            (24 * 60 * 60 * 1000)

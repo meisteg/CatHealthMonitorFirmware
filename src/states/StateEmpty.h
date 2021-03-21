@@ -19,7 +19,14 @@ public:
     void loop() override;
 
 private:
+    // Reports battery charged or battery low events to the user as needed.
     void checkBatteryState();
+
+    // Automatically bring network connection up or down as needed.
+    void networkUpDown();
+
+    // Signal that the network is needed. Returns true if network is available, false if not.
+    bool networkNeeded();
 
     int mNumSameNonZeroReadingsPounds;
     int mNumSameNonZeroReadingsGrams;
@@ -27,6 +34,7 @@ private:
     float mPrevReadingGrams;
     bool mSentBatteryWarning;
     bool mWasBatteryCharging;
+    system_tick_t mTimeNetworkNeeded;
 };
 
 #endif

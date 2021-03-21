@@ -18,6 +18,9 @@ Serial1LogHandler log1Handler(SERIAL_BAUD, LOG_LEVEL_WARN, { // Logging level fo
     {"app", LOG_LEVEL_TRACE}                                 // Logging level for all application messages
 });
 
+// Used to setup the system LED theme
+LEDSystemTheme theme;
+
 int catTrain(String cat_name)
 {
     if (StateManager::get()->isState(StateManager::STATE_EMPTY) &&
@@ -107,6 +110,13 @@ void setup()
 
     // Publish vitals each hour
     Particle.publishVitals(3600);
+
+    // Setup for graceful disconnects from the cloud
+    Particle.setDisconnectOptions(CloudDisconnectOptions().graceful(true).timeout(5s));
+
+    // Disable the breathing white when network disabled
+    theme.setColor(LED_SIGNAL_NETWORK_OFF, RGB_COLOR_NONE);
+    theme.apply();
 }
 
 void loop()
@@ -127,7 +137,9 @@ void loop()
     }
 
     // Ensure the time stays sync'd with the cloud
-    if (((millis() - Particle.timeSyncedLast()) > TIME_SYNC_MILLIS) && Particle.syncTimeDone())
+    if (((millis() - Particle.timeSyncedLast()) > TIME_SYNC_MILLIS) &&
+        Particle.connected() &&
+        Particle.syncTimeDone())
     {
         Particle.syncTime();
     }
