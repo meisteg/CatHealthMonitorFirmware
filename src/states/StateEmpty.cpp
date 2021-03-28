@@ -20,6 +20,14 @@ String StateEmpty::getName()
     return "EMPTY";
 }
 
+bool StateEmpty::takeReading(CatScale *scale)
+{
+    bool ret = scale->takeReading();
+
+    mCanEnterUlp = ret;
+    return ret;
+}
+
 void StateEmpty::processReading(CatScale *scale)
 {
     float pounds = scale->getPounds(true);
@@ -97,6 +105,7 @@ void StateEmpty::enter()
     mPrevReadingGrams = 0.0f;
 
     mTimeNetworkNeeded = millis();
+    mCanEnterUlp = false;
 
     // Enable OTA updates while empty
     System.enableUpdates();
@@ -107,7 +116,7 @@ void StateEmpty::loop()
     if (Particle.connected()) CatManager::get()->checkLastCatVisits();
 
     checkBatteryState();
-    networkUpDown();
+    pwrManagement();
 }
 
 void StateEmpty::checkBatteryState()
@@ -151,7 +160,7 @@ void StateEmpty::checkBatteryState()
     }
 }
 
-void StateEmpty::networkUpDown()
+void StateEmpty::pwrManagement()
 {
 #if STAY_CONNECTED_WHEN_ON_USB
     bool isUsbPowered = CatScale::get()->isUsbPowered();
@@ -176,6 +185,24 @@ void StateEmpty::networkUpDown()
         {
             Log.info("Disconnecting from WiFi");
             WiFi.off();
+        }
+        else if (mCanEnterUlp)
+        {
+            Log.info("Entering ULTRA_LOW_POWER mode");
+
+            // Workaround issue where LED would flash when exiting ULP.
+            // Issue doesn't occur when LED under user control (true).
+            RGB.control(true);
+
+            SystemSleepConfiguration config;
+            config.mode(SystemSleepMode::ULTRA_LOW_POWER).duration(5s);
+            System.sleep(config);
+
+            // Let the system have control over the LED again.
+            RGB.control(false);
+
+            // Need another good reading before entering ULP again
+            mCanEnterUlp = false;
         }
     }
 }

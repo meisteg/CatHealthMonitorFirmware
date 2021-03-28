@@ -14,6 +14,7 @@ class StateEmpty : public State
 public:
     StateEmpty();
     String getName() override;
+    bool takeReading(CatScale *scale) override;
     void processReading(CatScale *scale) override;
     void enter() override;
     void loop() override;
@@ -23,7 +24,7 @@ private:
     void checkBatteryState();
 
     // Automatically bring network connection up or down as needed.
-    void networkUpDown();
+    void pwrManagement();
 
     // Signal that the network is needed. Returns true if network is available, false if not.
     bool networkNeeded();
@@ -35,6 +36,7 @@ private:
     bool mSentBatteryWarning;
     bool mWasBatteryCharging;
     system_tick_t mTimeNetworkNeeded;
+    bool mCanEnterUlp;
 };
 
 #endif

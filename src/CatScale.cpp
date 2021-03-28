@@ -66,35 +66,30 @@ bool CatScale::takeReading()
     if (mDebugMode)
     {
         scaleValue = mPrevScaleReading;
-        mSmoothReading.newSample(scaleValue);
-
-        Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%u)\tUSB: %d  Charging: %d",
-                  getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
-        ret = true;
     }
     else
     {
         scaleValue = mScale.get_value();
+    }
 
-        // If the scale was just tared, there is not a previous reading to compare against.
-        // Simply take the reading in that case.
-        if (!isTared)
+    // If the scale was just tared, there is not a previous reading to compare against.
+    // Simply take the reading in that case.
+    if (!isTared)
+    {
+        // When a bad reading occurs, the HX711 takes much longer to be ready for the
+        // next reading. If there is a large gap between readings, it is safe to say
+        // the previous reading is garbage.
+        if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
         {
-            // When a bad reading occurs, the HX711 takes much longer to be ready for the
-            // next reading. If there is a large gap between readings, it is safe to say
-            // the previous reading is garbage.
-            if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
-            {
-                Log.warn("Dropping bad reading: %.2f pounds", getPounds((float)mPrevScaleReading));
-            }
-            // Previous reading should be good
-            else
-            {
-                mSmoothReading.newSample(mPrevScaleReading);
-                Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%u)\tUSB: %d  Charging: %d",
-                          getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
-                ret = true;
-            }
+            Log.warn("Dropping bad reading: %.2f pounds", getPounds((float)mPrevScaleReading));
+        }
+        // Previous reading should be good
+        else
+        {
+            mSmoothReading.newSample(mPrevScaleReading);
+            Log.trace("Pounds: %.2f\tGrams: %.0f\tBattery: %.2f (%u)\tUSB: %d  Charging: %d",
+                        getPounds(false), getGrams(false), getVoltage(), getBatteryPercent(), isUsbPowered(), isCharging());
+            ret = true;
         }
     }
 
