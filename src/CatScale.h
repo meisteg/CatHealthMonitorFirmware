@@ -48,6 +48,12 @@ public:
     // Get the current calculated percentage of the scale's battery
     unsigned int getBatteryPercent() const;
 
+    // Put the scale in power down mode
+    void powerDown();
+
+    // Wakes up the scale after power down mode
+    void powerUp();
+
 private:
     // Constructor
     CatScale();

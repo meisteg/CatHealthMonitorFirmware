@@ -162,8 +162,10 @@ void StateEmpty::checkBatteryState()
 
 void StateEmpty::pwrManagement()
 {
+    CatScale *scale = CatScale::get();
+
 #if STAY_CONNECTED_WHEN_ON_USB
-    bool isUsbPowered = CatScale::get()->isUsbPowered();
+    bool isUsbPowered = scale->isUsbPowered();
 
     // If we are plugged in, always be connected to the network
     if (isUsbPowered) networkNeeded();
@@ -194,9 +196,15 @@ void StateEmpty::pwrManagement()
             // Issue doesn't occur when LED under user control (true).
             RGB.control(true);
 
+            // Turn off external scale circuit to save power
+            scale->powerDown();
+
             SystemSleepConfiguration config;
             config.mode(SystemSleepMode::ULTRA_LOW_POWER).duration(5s);
             System.sleep(config);
+
+            // Turn on the external scale circuit to prepare for next reading
+            scale->powerUp();
 
             // Let the system have control over the LED again.
             RGB.control(false);

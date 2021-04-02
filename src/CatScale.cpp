@@ -51,7 +51,7 @@ bool CatScale::isReady()
 {
     if (mDebugMode)
     {
-        return (millis() - mLastReadingMillis) >= (MAX_MS_BETWEEN_READINGS / 2);
+        return mScale.is_ready() && (millis() - mLastReadingMillis) >= (MAX_MS_BETWEEN_READINGS / 2);
     }
 
     return mScale.is_ready();
@@ -174,4 +174,14 @@ unsigned int CatScale::getBatteryPercent() const
     smoothPercent.newSample(percent);
 
     return (unsigned int)(roundf(smoothPercent.val()));
+}
+
+void CatScale::powerDown()
+{
+    mScale.power_down();
+}
+
+void CatScale::powerUp()
+{
+    mScale.power_up();
 }
