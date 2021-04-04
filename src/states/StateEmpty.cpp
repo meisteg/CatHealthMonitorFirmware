@@ -20,14 +20,6 @@ String StateEmpty::getName()
     return "EMPTY";
 }
 
-bool StateEmpty::takeReading(CatScale *scale)
-{
-    bool ret = scale->takeReading();
-
-    mCanEnterUlp = ret;
-    return ret;
-}
-
 void StateEmpty::processReading(CatScale *scale)
 {
     float pounds = scale->getPounds(true);
@@ -41,10 +33,14 @@ void StateEmpty::processReading(CatScale *scale)
         {
             // In order to have an accurate deposit check, need to have minimal scale drift.
             float grams = scale->getGrams(true);
-            if ((grams != mPrevReadingGrams) || (fabs(grams) < 8.0f))
+            if ((grams != mPrevReadingGrams) || (fabs(grams) < MAX_DRIFT_GRAMS))
             {
                 mNumSameNonZeroReadingsGrams = 0;
                 mPrevReadingGrams = grams;
+
+                // Readings taken immediately after waking up seem to show more drift.
+                // Only go back to ULP if drift looks good.
+                mCanEnterUlp = (fabs(grams) < MAX_DRIFT_GRAMS);
             }
             else
             {

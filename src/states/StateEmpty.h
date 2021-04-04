@@ -14,7 +14,6 @@ class StateEmpty : public State
 public:
     StateEmpty();
     String getName() override;
-    bool takeReading(CatScale *scale) override;
     void processReading(CatScale *scale) override;
     void enter() override;
     void loop() override;

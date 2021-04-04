@@ -5,3 +5,4 @@ lib/*
 *.bin
 
 CatHealthMonitorFirmware.cpp
+putty.log

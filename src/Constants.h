@@ -51,6 +51,9 @@
 // Maximum amount a cat's weight can change between visits
 #define MAX_CAT_WEIGHT_CHANGE       0.30f
 
+// Maximum allowed scale drift in grams
+#define MAX_DRIFT_GRAMS             8.0f
+
 // Maximum number of milliseconds allowed between readings. If the previous reading
 // occurs more than this number of milliseconds in the past, assume it is a bad
 // reading and throw it away.
