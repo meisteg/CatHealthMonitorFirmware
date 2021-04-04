@@ -79,9 +79,14 @@ bool CatScale::takeReading()
         // When a bad reading occurs, the HX711 takes much longer to be ready for the
         // next reading. If there is a large gap between readings, it is safe to say
         // the previous reading is garbage.
-        if ((now - mLastReadingMillis) > MAX_MS_BETWEEN_READINGS)
+        system_tick_t delta_time = (now - mLastReadingMillis);
+        if (delta_time > MAX_MS_BETWEEN_READINGS)
         {
-            Log.warn("Dropping bad reading: %.2f pounds", getPounds((float)mPrevScaleReading));
+            // Squelch warning if waking from ULP since it will always be treated as bad
+            if (delta_time < ULP_DURATION_MS)
+            {
+                Log.warn("Dropping bad reading: %.2f pounds", getPounds((float)mPrevScaleReading));
+            }
         }
         // Previous reading should be good
         else

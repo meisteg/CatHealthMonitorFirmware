@@ -196,7 +196,7 @@ void StateEmpty::pwrManagement()
             scale->powerDown();
 
             SystemSleepConfiguration config;
-            config.mode(SystemSleepMode::ULTRA_LOW_POWER).duration(5s);
+            config.mode(SystemSleepMode::ULTRA_LOW_POWER).duration(ULP_DURATION_MS);
             System.sleep(config);
 
             // Turn on the external scale circuit to prepare for next reading
