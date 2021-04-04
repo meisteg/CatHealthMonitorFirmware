@@ -102,6 +102,7 @@ void StateEmpty::enter()
 
     mTimeNetworkNeeded = millis();
     mCanEnterUlp = false;
+    mConnectingToParticle = false;
 
     // Enable OTA updates while empty
     System.enableUpdates();
@@ -167,6 +168,12 @@ void StateEmpty::pwrManagement()
     if (isUsbPowered) networkNeeded();
 #endif
 
+    if (Particle.connected())
+    {
+        // Connection successful - clear connecting flag
+        mConnectingToParticle = false;
+    }
+
     // Disable network after idle delay
     if (((millis() - mTimeNetworkNeeded) > NETWORK_DISABLE_DELAY_MS)
 #if STAY_CONNECTED_WHEN_ON_USB
@@ -213,20 +220,17 @@ void StateEmpty::pwrManagement()
 
 bool StateEmpty::networkNeeded()
 {
-    static bool connecting = false;
     mTimeNetworkNeeded = millis();
     bool available = Particle.connected();
 
     // There is no Particle.connecting() function that can be used to check that
-    // Particle.connect() has already been called, so use local connecting flag.
-    if (!available && !connecting)
+    // Particle.connect() has already been called, so use connecting flag.
+    if (!available && !mConnectingToParticle)
     {
         Log.info("Connecting to Particle network");
         Particle.connect();
-        connecting = true;
+        mConnectingToParticle = true;
     }
-
-    if (available) connecting = false;
 
     return available;
 }

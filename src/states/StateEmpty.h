@@ -36,6 +36,7 @@ private:
     bool mWasBatteryCharging;
     system_tick_t mTimeNetworkNeeded;
     bool mCanEnterUlp;
+    bool mConnectingToParticle;
 };
 
 #endif
