@@ -127,7 +127,7 @@ void StateEmpty::checkBatteryState()
         mSentBatteryWarning = false;
 
         bool isCharging = scale->isCharging();
-        if (mWasBatteryCharging && !isCharging)
+        if (mWasBatteryCharging && !isCharging && (scale->getBatteryPercent() >= 100))
         {
             if (networkNeeded())
             {
