@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef SCALE_CONFIG_H
@@ -31,11 +31,23 @@ private:
 
     struct ScaleCfg
     {
+        // Magic number used to verify that scale configuration has been initialized
         uint32_t magic;
+
+        // Calibration factor of the scale
         int32_t calibration_factor;
+
+        // Key to use when using the Adafruit IO API
         char aio_key[AIO_KEY_LEN + 1];
+
+        // The number of readings in a row that must match before action is taken
         uint8_t num_readings_for_stable;
+
+        // Time (in seconds) to send an alert if a cat's last visit time exceeds (0 to disable)
         uint32_t no_visit_alert_time;
+
+        // Version of this scale configuraton schema
+        uint8_t version;
     };
 
     ScaleCfg mScaleCfg;

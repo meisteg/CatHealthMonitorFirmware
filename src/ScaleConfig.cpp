@@ -22,6 +22,7 @@ ScaleConfig::ScaleConfig()
         mScaleCfg.aio_key[0] = 0;
         mScaleCfg.num_readings_for_stable = READINGS_TO_BE_STABLE_INIT;
         mScaleCfg.no_visit_alert_time = NO_VISIT_ALERT_TIME_INIT;
+        mScaleCfg.version = 0;
         save();
     }
     else
@@ -32,6 +33,13 @@ ScaleConfig::ScaleConfig()
         Log.info("Calibration factor: %ld", calibrationFactor());
         Log.info("Number of readings to be stable: %u", numReadingsForStable());
         Log.info("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
+    }
+
+    // Ensure version is set correctly on existing devices.
+    if (mScaleCfg.version != 0)
+    {
+        mScaleCfg.version = 0;
+        save();
     }
 }
 
