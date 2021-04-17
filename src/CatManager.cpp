@@ -141,7 +141,7 @@ bool CatManager::publishCatDatabase() const
 
     for (int i = 0; i < mCatDataBase.num_cats; ++i)
     {
-        snprintf(entry, sizeof(entry), "%s\"%s\":{\"weight\":%.1f,\"last_visit\":%lld}",
+        snprintf(entry, sizeof(entry), "%s\"%s\":{\"weight\":%.1f,\"last_visit\":%ld}",
                  (i > 0) ? ", " : "", mCatDataBase.cats[i].name, mCatDataBase.cats[i].weight, mCatDataBase.cats[i].last_visit);
         strncat(publish, entry, sizeof(publish) - strlen(publish));
     }

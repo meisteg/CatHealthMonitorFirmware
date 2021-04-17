@@ -75,7 +75,7 @@ private:
     {
         char name[MAX_CAT_NAME_LEN];
         float weight;
-        time_t last_visit;
+        time32_t last_visit;
         uint16_t flags;
         uint16_t last_duration;
         float last_deposit;
