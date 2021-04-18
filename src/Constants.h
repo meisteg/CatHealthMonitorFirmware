@@ -38,9 +38,6 @@
 // Number of Grams in a Pound
 #define GRAMS_IN_POUND              453.592f
 
-// Flag to indicate if the compiled target is the gateway device
-#define IS_MASTER_DEVICE            (1)
-
 // Minimum weight of a cat before it will register
 // Must be greater than CAT_NOT_PRESENT_THRESHOLD
 #define MIN_CAT_WEIGHT_LBS          4.0f

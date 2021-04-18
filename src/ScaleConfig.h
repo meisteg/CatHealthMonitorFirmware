@@ -25,6 +25,9 @@ public:
     uint32_t noVisitAlertTime();
     void noVisitAlertTime(uint32_t secs);
 
+    bool isMaster();
+    void isMaster(bool master);
+
 private:
     ScaleConfig();
     void save();
@@ -48,6 +51,9 @@ private:
 
         // Version of this scale configuraton schema
         uint8_t version;
+
+        // Flags for changing device behavior
+        uint8_t flags;
     };
 
     ScaleCfg mScaleCfg;

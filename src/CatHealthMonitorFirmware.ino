@@ -86,14 +86,32 @@ int setNoVisitAlert(String secs)
     return 0;
 }
 
+int setMasterDevice(String master)
+{
+    ScaleConfig::get()->isMaster(atoi(master.c_str()) != 0);
+
+    Log.info("New master state: %s",
+             ScaleConfig::get()->isMaster() ? "Master" : "Slave");
+
+    return 0;
+}
+
 void setup()
 {
-    Particle.function("train", catTrain);
-    Particle.function("reset", resetCats);
+    Log.info("Cat Health Monitor");
+    Log.info("Build date/time: %s %s", __DATE__, __TIME__);
+
     Particle.function("calibration", scaleCalibrate);
     Particle.function("aio_key", setAIOKey);
     Particle.function("readings_for_stable", setReadingsForStable);
-    Particle.function("no_visit_alert", setNoVisitAlert);
+    Particle.function("master", setMasterDevice);
+    if (ScaleConfig::get()->isMaster())
+    {
+        // Master devices have additional functions available
+        Particle.function("train", catTrain);
+        Particle.function("reset", resetCats);
+        Particle.function("no_visit_alert", setNoVisitAlert);
+    }
 
     StateManager::get()->registerVariable();
 
@@ -102,8 +120,6 @@ void setup()
     pinMode(PWR, INPUT);
     pinMode(CHG, INPUT);
 
-    Log.info("Cat Health Monitor");
-    Log.info("Build date/time: %s %s", __DATE__, __TIME__);
     CatManager::get()->publishCatDatabase();
 
     CatScale::get()->begin();

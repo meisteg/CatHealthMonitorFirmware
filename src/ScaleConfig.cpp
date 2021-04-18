@@ -5,6 +5,9 @@
 #include "ScaleConfig.h"
 #include "Constants.h"
 
+// Flag to indicate that this device is the master device
+#define FLAG_MASTER_DEVICE   0x01
+
 ScaleConfig* ScaleConfig::get()
 {
     static ScaleConfig scaleConfig;
@@ -22,25 +25,28 @@ ScaleConfig::ScaleConfig()
         mScaleCfg.aio_key[0] = 0;
         mScaleCfg.num_readings_for_stable = READINGS_TO_BE_STABLE_INIT;
         mScaleCfg.no_visit_alert_time = NO_VISIT_ALERT_TIME_INIT;
-        mScaleCfg.version = 0;
+        mScaleCfg.version = 1;
+        mScaleCfg.flags = FLAG_MASTER_DEVICE;
         save();
-    }
-    else
-    {
-#if USE_ADAFRUIT_IO
-        Log.info("AIO Key: %s", aioKey());
-#endif
-        Log.info("Calibration factor: %ld", calibrationFactor());
-        Log.info("Number of readings to be stable: %u", numReadingsForStable());
-        Log.info("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
     }
 
-    // Ensure version is set correctly on existing devices.
-    if (mScaleCfg.version != 0)
+    // Check if the configuration needs to be upgraded to a new version schema
+    if (mScaleCfg.version < 1)
     {
-        mScaleCfg.version = 0;
+        Log.info("Updating configuration to version 1");
+
+        mScaleCfg.flags = FLAG_MASTER_DEVICE;
+        mScaleCfg.version = 1;
         save();
     }
+
+#if USE_ADAFRUIT_IO
+    Log.info("AIO Key: %s", aioKey());
+#endif
+    Log.info("Calibration factor: %ld", calibrationFactor());
+    Log.info("Number of readings to be stable: %u", numReadingsForStable());
+    Log.info("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
+    Log.info("Master Device: %s", isMaster() ? "Yes" : "No");
 }
 
 void ScaleConfig::save()
@@ -91,5 +97,23 @@ void ScaleConfig::noVisitAlertTime(uint32_t secs)
     // NOTE: Setting a larger time will not resend an alert if an alert was
     // already sent for a cat. The cat must visit to reset the alert.
     mScaleCfg.no_visit_alert_time = secs;
+    save();
+}
+
+bool ScaleConfig::isMaster()
+{
+    return (mScaleCfg.flags & FLAG_MASTER_DEVICE) != 0;
+}
+
+void ScaleConfig::isMaster(bool master)
+{
+    if (master)
+    {
+        mScaleCfg.flags |= FLAG_MASTER_DEVICE;
+    }
+    else
+    {
+        mScaleCfg.flags &= ~(FLAG_MASTER_DEVICE);
+    }
     save();
 }

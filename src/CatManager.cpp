@@ -149,7 +149,12 @@ bool CatManager::publishCatDatabase() const
     strncat(publish, "}}", sizeof(publish) - strlen(publish));
     Log.info(publish);
 
-    return Particle.publish("cat_database", publish, PRIVATE);
+    // Only publish database to the cloud if a master device.
+    if (ScaleConfig::get()->isMaster())
+    {
+        return Particle.publish("cat_database", publish, PRIVATE);
+    }
+    return false;
 }
 
 bool CatManager::selectCatByWeight(float weight)
@@ -285,15 +290,11 @@ bool CatManager::publishCatVisit()
         }
 
         Log.info("Publishing: %s", publish);
-#if IS_MASTER_DEVICE
-        ret = Particle.publish("cat_visit", publish, PRIVATE);
+        ret = Particle.publish(ScaleConfig::get()->isMaster() ? "cat_visit" : "cat_visit_slave", publish, PRIVATE);
         if (!ret)
         {
             Log.error("Failed to publish to Particle!");
         }
-#else
-        ret = true;
-#endif
 
 #if USE_ADAFRUIT_IO
         // Build Adafruit IO feed name
@@ -319,30 +320,33 @@ bool CatManager::publishCatVisit()
 
 void CatManager::checkLastCatVisits()
 {
-#if IS_MASTER_DEVICE
-    uint32_t alertTime = ScaleConfig::get()->noVisitAlertTime();
-    CatDataBaseEntry* entry;
+    ScaleConfig* scaleCfg = ScaleConfig::get();
 
-    if (alertTime > 0)
+    if (scaleCfg->isMaster())
     {
-        time_t now = Time.now();
+        uint32_t alertTime = scaleCfg->noVisitAlertTime();
+        CatDataBaseEntry* entry;
 
-        for (int i = 0; i < mCatDataBase.num_cats; ++i)
+        if (alertTime > 0)
         {
-            entry = &(mCatDataBase.cats[i]);
+            time_t now = Time.now();
 
-            if (((uint32_t)(now - entry->last_visit) > alertTime) &&
-                !(entry->flags & CAT_FLAG_NO_VISIT_ALERT_SENT))
+            for (int i = 0; i < mCatDataBase.num_cats; ++i)
             {
-                entry->flags |= CAT_FLAG_NO_VISIT_ALERT_SENT;
-                EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+                entry = &(mCatDataBase.cats[i]);
 
-                char publish[128];
-                snprintf(publish, sizeof(publish), "{\"msg\": \"%s has not visited for over %lu hours.\"}",
-                         entry->name, alertTime / 3600);
-                Particle.publish("cat_alert", publish, PRIVATE);
+                if (((uint32_t)(now - entry->last_visit) > alertTime) &&
+                    !(entry->flags & CAT_FLAG_NO_VISIT_ALERT_SENT))
+                {
+                    entry->flags |= CAT_FLAG_NO_VISIT_ALERT_SENT;
+                    EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+
+                    char publish[128];
+                    snprintf(publish, sizeof(publish), "{\"msg\": \"%s has not visited for over %lu hours.\"}",
+                            entry->name, alertTime / 3600);
+                    Particle.publish("cat_alert", publish, PRIVATE);
+                }
             }
         }
     }
-#endif
 }
