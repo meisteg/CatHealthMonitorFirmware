@@ -45,8 +45,7 @@ void StateEmpty::processReading(CatScale *scale)
             else
             {
                 mNumSameNonZeroReadingsGrams++;
-                if ((mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable()) &&
-                    networkNeeded())
+                if (mNumSameNonZeroReadingsGrams >= ScaleConfig::get()->numReadingsForStable())
                 {
                     // Scale drift, cat deposits or litter box cleaning
                     Log.info("Automatic tare due to non-zero grams: %.0f", grams);
