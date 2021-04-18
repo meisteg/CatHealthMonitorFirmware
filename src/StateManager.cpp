@@ -18,7 +18,7 @@ StateManager::StateManager() : mStateCurrent(STATE_TARE)
 
 bool StateManager::registerVariable()
 {
-    return Particle.variable("state", mStateCurrent);
+    return Particle.variable("state", [this](){ return this->getStateString(mStateCurrent); });
 }
 
 bool StateManager::isState(int state)
