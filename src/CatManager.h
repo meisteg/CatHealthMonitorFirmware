@@ -85,6 +85,9 @@ private:
     // Returns true if a cat is selected, else false
     bool isCatSelected() { return (mSelectedCat >= 0); };
 
+    // Handle slave device cat visit
+    bool slaveCatVisit(const char *json);
+
     // Update cat database using provided JSON
     bool updateCatDatabaseJson(const char *json);
 

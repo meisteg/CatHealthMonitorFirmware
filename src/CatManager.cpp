@@ -61,10 +61,18 @@ void CatManager::readCatDatabase()
 
 void CatManager::setup()
 {
-    // Master devices handle cat database requests, slave devices consume the
-    // cat database.
-    Particle.subscribe(ScaleConfig::get()->isMaster() ? "req_cat_db" : "cat_database",
-                       &CatManager::subscriptionHandler, this);
+    if (ScaleConfig::get()->isMaster())
+    {
+        // Master devices handle cat database requests (slave_req_cat_db) and
+        // cat visits to slave devices (slave_cat_visit)
+        Particle.subscribe("slave_", &CatManager::subscriptionHandler, this);
+    }
+    else
+    {
+        // Slave devices consume the cat database.
+        Particle.subscribe("cat_database", &CatManager::subscriptionHandler, this);
+    }
+
     publishCatDatabase();
 }
 
@@ -306,7 +314,7 @@ bool CatManager::publishCatVisit()
         }
 
         Log.info("Publishing: %s", publish);
-        ret = Particle.publish(ScaleConfig::get()->isMaster() ? "cat_visit" : "cat_visit_slave", publish, PRIVATE);
+        ret = Particle.publish(ScaleConfig::get()->isMaster() ? "cat_visit" : "slave_cat_visit", publish, PRIVATE);
         if (!ret)
         {
             Log.error("Failed to publish to Particle!");
@@ -371,7 +379,7 @@ bool CatManager::requestDatabase()
 {
     if (!ScaleConfig::get()->isMaster())
     {
-        return Particle.publish("req_cat_db", PRIVATE);
+        return Particle.publish("slave_req_cat_db", PRIVATE);
     }
 
     return false; // No request made
@@ -379,11 +387,19 @@ bool CatManager::requestDatabase()
 
 void CatManager::subscriptionHandler(const char *event, const char *data)
 {
-    // If a cat is selected, ignore the event
-    if (isCatSelected()) return;
-
+    // Slave device reporting a cat visit
+    if (strcmp("slave_cat_visit", event) == 0)
+    {
+        slaveCatVisit(data);
+    }
+    // Remaining events cannot be handled if a cat is selected. If a cat is
+    // selected, ignore the event.
+    else if (isCatSelected())
+    {
+        Log.warn("Event (%s) ignored due to cat selected", event);
+    }
     // Slave request for cat database from master
-    if (strcmp("req_cat_db", event) == 0)
+    else if (strcmp("slave_req_cat_db", event) == 0)
     {
         publishCatDatabase();
     }
@@ -396,6 +412,68 @@ void CatManager::subscriptionHandler(const char *event, const char *data)
     {
         Log.error("Event (%s) not recognized!", event);
     }
+}
+
+bool CatManager::slaveCatVisit(const char *json)
+{
+    if (!json)
+    {
+        Log.error("JSON is NULL!");
+        return false;
+    }
+
+    CatDataBaseEntry catVisit;
+    JSONValue outerObj = JSONValue::parseCopy(json);
+    JSONObjectIterator iter(outerObj);
+    while(iter.next())
+    {
+        if (iter.name() == "cat")
+        {
+            String name(iter.value().toString());
+            name.getBytes((unsigned char *)catVisit.name, sizeof(catVisit.name));
+        }
+        else if (iter.name() == "weight")
+        {
+            catVisit.weight = iter.value().toDouble();
+        }
+        else if (iter.name() == "duration")
+        {
+            catVisit.last_duration = iter.value().toInt();
+        }
+        else if (iter.name() == "deposit")
+        {
+            catVisit.last_deposit = iter.value().toDouble();
+        }
+    }
+
+    // Look for cat in the database
+    for (int i = 0; i < mCatDataBase.num_cats; ++i)
+    {
+        if (strncmp(mCatDataBase.cats[i].name, catVisit.name, MAX_CAT_NAME_LEN) == 0)
+        {
+            mCatDataBase.cats[i].weight = catVisit.weight;
+            mCatDataBase.cats[i].last_duration = catVisit.last_duration;
+            mCatDataBase.cats[i].last_deposit = catVisit.last_deposit;
+            mCatDataBase.cats[i].last_visit = Time.now();
+
+            // Clear no visit alert flag
+            mCatDataBase.cats[i].flags &= ~(CAT_FLAG_NO_VISIT_ALERT_SENT);
+
+            // Can only save updates to the cat database when no cat is selected.
+            // If currently selected cat, wait to save the changes until active
+            // cat visit is completed.
+            if (!isCatSelected())
+            {
+                EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+            }
+
+            Log.info("Slave device cat visit handled");
+            return Particle.publish("cat_visit", json, PRIVATE);
+        }
+    }
+
+    Log.error("Slave device cat not found - ignoring visit");
+    return false;
 }
 
 bool CatManager::updateCatDatabaseJson(const char *json)
