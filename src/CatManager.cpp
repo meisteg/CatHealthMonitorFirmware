@@ -142,26 +142,33 @@ bool CatManager::completeTraining(float weight)
 
 bool CatManager::publishCatDatabase() const
 {
-    char publish[512];
-    char entry[80];
+    char buf[512];
 
-    snprintf(publish, sizeof(publish), "{\"num_cats\":%u, \"version\":%u, \"cats\":{",
-             mCatDataBase.num_cats, mCatDataBase.version);
+    memset(buf, 0, sizeof(buf));
+    JSONBufferWriter writer(buf, sizeof(buf) - 1);
+
+    writer.beginObject();
+    writer.name("num_cats").value(mCatDataBase.num_cats);
+    writer.name("version").value(mCatDataBase.version);
+    writer.name("cats").beginObject();
 
     for (int i = 0; i < mCatDataBase.num_cats; ++i)
     {
-        snprintf(entry, sizeof(entry), "%s\"%s\":{\"weight\":%.1f,\"last_visit\":%ld}",
-                 (i > 0) ? ", " : "", mCatDataBase.cats[i].name, mCatDataBase.cats[i].weight, mCatDataBase.cats[i].last_visit);
-        strncat(publish, entry, sizeof(publish) - strlen(publish));
+        writer.name(mCatDataBase.cats[i].name).beginObject();
+        writer.name("weight").value(mCatDataBase.cats[i].weight, 1);
+        writer.name("last_visit").value((int)(mCatDataBase.cats[i].last_visit));
+        writer.endObject();
     }
 
-    strncat(publish, "}}", sizeof(publish) - strlen(publish));
-    Log.info(publish);
+    writer.endObject(); // cats
+    writer.endObject(); // top level
+
+    Log.info(buf);
 
     // Only publish database to the cloud if a master device.
     if (ScaleConfig::get()->isMaster())
     {
-        return Particle.publish("cat_database", publish, PRIVATE);
+        return Particle.publish("cat_database", buf, PRIVATE);
     }
     return false;
 }
@@ -459,5 +466,7 @@ bool CatManager::updateCatDatabaseJson(const char *json)
     }
 
     EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+    Log.info("Cat database updated via JSON");
+
     return true;
 }
