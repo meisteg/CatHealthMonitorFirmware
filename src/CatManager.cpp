@@ -59,6 +59,15 @@ void CatManager::readCatDatabase()
     }
 }
 
+void CatManager::setup()
+{
+    // Master devices handle cat database requests, slave devices consume the
+    // cat database.
+    Particle.subscribe(ScaleConfig::get()->isMaster() ? "req_cat_db" : "cat_database",
+                       &CatManager::subscriptionHandler, this);
+    publishCatDatabase();
+}
+
 void CatManager::reset()
 {
     if (mCatDataBase.num_cats)
@@ -165,7 +174,7 @@ bool CatManager::selectCatByWeight(float weight)
     {
         if (fabs(mCatDataBase.cats[i].weight - weight) <= MAX_CAT_WEIGHT_CHANGE)
         {
-            if (mSelectedCat >= 0)
+            if (isCatSelected())
             {
                 Log.error("Multiple cats too close in weight");
                 Particle.publish("cat_alert", "{\"msg\": \"Multiple cats too close in weight!\"}", PRIVATE);
@@ -177,7 +186,7 @@ bool CatManager::selectCatByWeight(float weight)
         }
     }
 
-    if (mSelectedCat >= 0)
+    if (isCatSelected())
     {
         Log.info("%s selected", mCatDataBase.cats[mSelectedCat].name);
         setCatWeight(weight);
@@ -214,7 +223,7 @@ void CatManager::deselectCat()
 
 bool CatManager::setCatWeight(float weight)
 {
-    if (mSelectedCat >= 0)
+    if (isCatSelected())
     {
         if (mCatDataBase.cats[mSelectedCat].weight != weight)
         {
@@ -230,7 +239,7 @@ bool CatManager::setCatWeight(float weight)
 
 bool CatManager::setCatLastDuration(uint16_t duration)
 {
-    if (mSelectedCat >= 0)
+    if (isCatSelected())
     {
         mCatDataBase.cats[mSelectedCat].last_duration = duration;
         mCatDataBase.cats[mSelectedCat].last_visit = Time.now();
@@ -243,7 +252,7 @@ bool CatManager::setCatLastDuration(uint16_t duration)
 
 bool CatManager::setCatLastDeposit(float deposit)
 {
-    if (mSelectedCat >= 0)
+    if (isCatSelected())
     {
         mCatDataBase.cats[mSelectedCat].last_deposit = deposit;
         return true;
@@ -262,7 +271,7 @@ bool CatManager::publishCatVisit()
     char feed[64];
 #endif
 
-    if (mSelectedCat >= 0)
+    if (isCatSelected())
     {
         entry = &(mCatDataBase.cats[mSelectedCat]);
 
@@ -349,4 +358,106 @@ void CatManager::checkLastCatVisits()
             }
         }
     }
+}
+
+bool CatManager::requestDatabase()
+{
+    if (!ScaleConfig::get()->isMaster())
+    {
+        return Particle.publish("req_cat_db", PRIVATE);
+    }
+
+    return false; // No request made
+}
+
+void CatManager::subscriptionHandler(const char *event, const char *data)
+{
+    // If a cat is selected, ignore the event
+    if (isCatSelected()) return;
+
+    // Slave request for cat database from master
+    if (strcmp("req_cat_db", event) == 0)
+    {
+        publishCatDatabase();
+    }
+    // Cat database response from master to slave
+    else if (strcmp("cat_database", event) == 0)
+    {
+        updateCatDatabaseJson(data);
+    }
+    else
+    {
+        Log.error("Event (%s) not recognized!", event);
+    }
+}
+
+bool CatManager::updateCatDatabaseJson(const char *json)
+{
+    if (!json)
+    {
+        Log.error("JSON is NULL!");
+        return false;
+    }
+
+    unsigned int i = 0;
+    JSONValue outerObj = JSONValue::parseCopy(json);
+    JSONObjectIterator iter(outerObj);
+    while(iter.next())
+    {
+        if (iter.name() == "num_cats")
+        {
+            mCatDataBase.num_cats = iter.value().toInt();
+        }
+        else if (iter.name() == "version")
+        {
+            // Is it okay to accept a cat database that is a different version?
+            if (iter.value().toInt() != mCatDataBase.version)
+            {
+                Log.warn("Cat database version mismatch: json=%d, local=%d",
+                         iter.value().toInt(), mCatDataBase.version);
+            }
+        }
+        else if (iter.name() == "cats")
+        {
+            JSONObjectIterator catsIter(iter.value());
+            while(catsIter.next())
+            {
+                CatDataBaseEntry* entry = &(mCatDataBase.cats[i++]);
+                String cat_name(catsIter.name());
+                cat_name.getBytes((unsigned char *)entry->name, sizeof(entry->name));
+
+                JSONObjectIterator catIter(catsIter.value());
+                while(catIter.next())
+                {
+                    if (catIter.name() == "weight")
+                    {
+                        entry->weight = catIter.value().toDouble();
+                    }
+                    else if (catIter.name() == "last_visit")
+                    {
+                        entry->last_visit = catIter.value().toInt();
+                    }
+                    else
+                    {
+                        Log.warn("Unknown cat obj key: %s", (const char *)catIter.name());
+                    }
+                }
+            }
+        }
+        else
+        {
+            Log.warn("Unknown outer obj key: %s", (const char *)iter.name());
+        }
+    }
+
+    // Sanity check that expected number of cats were in the json
+    if (i != mCatDataBase.num_cats)
+    {
+        Log.error("JSON didn't have expected number of cats");
+        readCatDatabase();
+        return false;
+    }
+
+    EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
+    return true;
 }

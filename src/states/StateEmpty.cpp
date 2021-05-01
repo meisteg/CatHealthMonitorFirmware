@@ -105,6 +105,8 @@ void StateEmpty::enter()
 
     // Enable OTA updates while empty
     System.enableUpdates();
+
+    if (Particle.connected()) CatManager::get()->requestDatabase();
 }
 
 void StateEmpty::loop()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef CAT_MANAGER_H
@@ -17,6 +17,10 @@ public:
     // Get the CatManager singleton
     static CatManager* get();
 
+    // Perform initial setup: subscribe to database events and publish
+    // the current database
+    void setup();
+
     // Removes all saved cats from memory
     void reset();
 
@@ -30,9 +34,6 @@ public:
     // Completes a cat's training and saves new cat into the database
     // Returns true on success, and false if weight matches existing cat
     bool completeTraining(float weight);
-
-    // Publish the cat database to the specified network
-    bool publishCatDatabase() const;
 
     // Selects a cat in the database with the specified weight (ish)
     // Returns true if cat selected, false if no cat with that weight found
@@ -64,12 +65,28 @@ public:
     // last visit occured too long ago. Only functional on the master device.
     void checkLastCatVisits();
 
+    // Requests latest cat database from master device. Only functional on the
+    // slave device.
+    bool requestDatabase();
+
 private:
     // Constructor
     CatManager();
 
     // Reads cat database from the EEPROM
     void readCatDatabase();
+
+    // Publish the cat database if the master device
+    bool publishCatDatabase() const;
+
+    // Handles the cat database events from other devices
+    void subscriptionHandler(const char *event, const char *data);
+
+    // Returns true if a cat is selected, else false
+    bool isCatSelected() { return (mSelectedCat >= 0); };
+
+    // Update cat database using provided JSON
+    bool updateCatDatabaseJson(const char *json);
 
     struct CatDataBaseEntry
     {

@@ -120,8 +120,7 @@ void setup()
     pinMode(PWR, INPUT);
     pinMode(CHG, INPUT);
 
-    CatManager::get()->publishCatDatabase();
-
+    CatManager::get()->setup();
     CatScale::get()->begin();
 
     // Publish vitals each hour
