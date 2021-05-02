@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2020 Gregory S. Meiste  <http://gregmeiste.com>
+ * Copyright (C) 2019-2021 Gregory S. Meiste  <http://gregmeiste.com>
  */
 
 #ifndef STATE_MANAGER_H
@@ -14,6 +14,7 @@
 #include "states/State.h"
 #include "states/StateDepositCheck.h"
 #include "states/StateCatPossible.h"
+#include "states/StateCalibrate.h"
 
 class StateManager
 {
@@ -27,6 +28,7 @@ public:
         STATE_CAT_PRESENT,
         STATE_DEPOSIT_CHECK,
         STATE_CAT_POSSIBLE,
+        STATE_CALIBRATE,
 
         // Add new states above this line
         STATE__MAX
@@ -64,7 +66,8 @@ private:
         new StateTrain(),
         new StateCatPresent(),
         new StateDepositCheck(),
-        new StateCatPossible()
+        new StateCatPossible(),
+        new StateCalibrate()
     };
 };
 
