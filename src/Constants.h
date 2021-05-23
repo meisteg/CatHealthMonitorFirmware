@@ -35,6 +35,9 @@
 // Time in milliseconds to wait in CAT_POSSIBLE state with a stable reading
 #define CAT_POSSIBLE_TIMEOUT_MS     30000
 
+// Maximum length of device name
+#define DEVICE_NAME_LEN             32
+
 // Number of Grams in a Pound
 #define GRAMS_IN_POUND              453.592f
 
@@ -46,7 +49,7 @@
 #define MAX_CAT_NAME_LEN            16
 
 // Maximum amount a cat's weight can change between visits
-#define MAX_CAT_WEIGHT_CHANGE       0.30f
+#define MAX_CAT_WEIGHT_CHANGE       0.50f
 
 // Maximum allowed scale drift in grams
 #define MAX_DRIFT_GRAMS             8.0f

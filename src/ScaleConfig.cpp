@@ -25,8 +25,9 @@ ScaleConfig::ScaleConfig()
         mScaleCfg.aio_key[0] = 0;
         mScaleCfg.num_readings_for_stable = READINGS_TO_BE_STABLE_INIT;
         mScaleCfg.no_visit_alert_time = NO_VISIT_ALERT_TIME_INIT;
-        mScaleCfg.version = 1;
+        mScaleCfg.version = 2;
         mScaleCfg.flags = FLAG_MASTER_DEVICE;
+        mScaleCfg.device_name[0] = 0;
         save();
     }
 
@@ -39,6 +40,14 @@ ScaleConfig::ScaleConfig()
         mScaleCfg.version = 1;
         save();
     }
+    if (mScaleCfg.version < 2)
+    {
+        Log.info("Updating configuration to version 2");
+
+        mScaleCfg.device_name[0] = 0;
+        mScaleCfg.version = 2;
+        save();
+    }
 
 #if USE_ADAFRUIT_IO
     Log.info("AIO Key: %s", aioKey());
@@ -47,6 +56,7 @@ ScaleConfig::ScaleConfig()
     Log.info("Number of readings to be stable: %u", numReadingsForStable());
     Log.info("No visit alert time (0 to disable): %lu seconds", noVisitAlertTime());
     Log.info("Master Device: %s", isMaster() ? "Yes" : "No");
+    Log.info("Device Name: %s", deviceName());
 }
 
 void ScaleConfig::save()
@@ -115,5 +125,16 @@ void ScaleConfig::isMaster(bool master)
     {
         mScaleCfg.flags &= ~(FLAG_MASTER_DEVICE);
     }
+    save();
+}
+
+char* ScaleConfig::deviceName()
+{
+    return mScaleCfg.device_name;
+}
+
+void ScaleConfig::deviceName(String name)
+{
+    name.getBytes((unsigned char *)mScaleCfg.device_name, sizeof(mScaleCfg.device_name));
     save();
 }

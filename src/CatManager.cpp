@@ -296,22 +296,30 @@ bool CatManager::publishCatVisit()
         // Save updates to cat database
         EEPROM.put(CAT_DATABASE_ADDR, mCatDataBase);
 
+        char duration_str[32];
         if (entry->last_duration > 60)
         {
             int mins = (entry->last_duration / 60);
             int secs = (entry->last_duration % 60);
-            snprintf(publish, sizeof(publish),
-                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %d, \"duration_str\": \"%d minute%s %d second%s\", \"deposit\": %.1f}",
-                     entry->name, entry->weight, entry->last_duration, mins,
-                     (mins > 1) ? "s" : "", secs, (secs == 1) ? "" : "s", entry->last_deposit);
+            snprintf(duration_str, sizeof(duration_str), "%d minute%s %d second%s",
+                     mins, (mins > 1) ? "s" : "", secs, (secs == 1) ? "" : "s");
         }
         else
         {
-            snprintf(publish, sizeof(publish),
-                     "{\"cat\": \"%s\", \"weight\": %.1f, \"duration\": %d, \"duration_str\": \"%d seconds\", \"deposit\": %.1f}",
-                     entry->name, entry->weight, entry->last_duration,
-                     entry->last_duration, entry->last_deposit);
+            snprintf(duration_str, sizeof(duration_str), "%d seconds", entry->last_duration);
         }
+
+        memset(publish, 0, sizeof(publish));
+        JSONBufferWriter writer(publish, sizeof(publish) - 1);
+
+        writer.beginObject();
+        writer.name("cat").value(entry->name);
+        writer.name("weight").value(entry->weight);
+        writer.name("duration").value(entry->last_duration);
+        writer.name("duration_str").value(duration_str);
+        writer.name("deposit").value(entry->last_deposit);
+        writer.name("device_name").value(ScaleConfig::get()->deviceName());
+        writer.endObject(); // top level
 
         Log.info("Publishing: %s", publish);
         ret = Particle.publish(ScaleConfig::get()->isMaster() ? "cat_visit" : "slave_cat_visit", publish, PRIVATE);

@@ -96,6 +96,19 @@ int setMasterDevice(String master)
     return 0;
 }
 
+int setDeviceName(String name)
+{
+    if (name.length() < (DEVICE_NAME_LEN - 1))
+    {
+        ScaleConfig::get()->deviceName(name);
+        Log.info("New Device Name: %s", ScaleConfig::get()->deviceName());
+
+        return 0;
+    }
+
+    return -1;
+}
+
 void setup()
 {
     Log.info("Cat Health Monitor");
@@ -105,6 +118,7 @@ void setup()
     Particle.function("aio_key", setAIOKey);
     Particle.function("readings_for_stable", setReadingsForStable);
     Particle.function("master", setMasterDevice);
+    Particle.function("device_name", setDeviceName);
     if (ScaleConfig::get()->isMaster())
     {
         // Master devices have additional functions available

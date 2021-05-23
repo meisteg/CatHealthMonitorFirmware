@@ -28,6 +28,9 @@ public:
     bool isMaster();
     void isMaster(bool master);
 
+    char* deviceName();
+    void deviceName(String name);
+
 private:
     ScaleConfig();
     void save();
@@ -54,6 +57,9 @@ private:
 
         // Flags for changing device behavior
         uint8_t flags;
+
+        // Name of the device
+        char device_name[DEVICE_NAME_LEN];
     };
 
     ScaleCfg mScaleCfg;
